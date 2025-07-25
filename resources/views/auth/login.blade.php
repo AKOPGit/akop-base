@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-<h1>Login</h1>
+<h1 class="flex items-center gap-2 text-xl font-bold"><x-heroicon-o-key class="w-6 h-6 text-gray-500"/> Login</h1>
 @if ($errors->any())
     <div>{{ implode(', ', $errors->all()) }}</div>
 @endif

@@ -8,7 +8,10 @@
 <h1>Welcome, {{ $user->name }}</h1>
 <form method="POST" action="{{ url('/logout') }}">
     @csrf
-    <button type="submit">Logout</button>
+    <button type="submit">
+        <x-heroicon-o-arrow-left-start-on-rectangle class="w-6 h-6 text-gray-500"/>
+        Logout
+    </button>
 </form>
 </body>
 </html>

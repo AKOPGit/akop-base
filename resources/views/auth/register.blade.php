@@ -5,7 +5,7 @@
     <title>Register</title>
 </head>
 <body>
-<h1>Register</h1>
+<h1><x-heroicon-o-key class="w-6 h-6 text-gray-500"/> Register</h1>
 @if ($errors->any())
     <div>{{ implode(', ', $errors->all()) }}</div>
 @endif

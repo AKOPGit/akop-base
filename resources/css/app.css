@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+@import './components/checkboxes.css';
+@import './components/radios.css';
+@import './components/scrollbar.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -9,4 +12,195 @@
 @theme {
     --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+
+    --animate-none: none;
+    --animate-spin: spin 1s linear infinite;
+    --animate-spin-slow: spin 2s linear infinite;
+    --animate-dots: dots 1.5s steps(4, end) infinite;
+
+    --animate-ping: ping 1s var(--ease-out) infinite;
+    --animate-ping-sm: ping-sm 1s var(--ease-out) infinite;
+    --animate-ping-once: ping 1s var(--ease-out);
+
+    --animate-pulse: pulse 2s var(--ease-in-out) infinite;
+    --animate-pulse-once: pulse 2s var(--ease-in-out);
+
+    --animate-bounce: bounce 1s infinite;
+    --animate-bounce-once: bounce 1s linear;
+    --animate-bounce-once-fast: bounce 0.5s ease-in;
+    --animate-bounce-once-slow: bounce 1.5s linear;
+
+    --animate-slide-down: slide-down 1s ease-out;
+    --animate-slide-up: slide-up 1s ease-out;
+    --animate-slide-up-fast: slide-up 0.5s ease-out;
+    --animate-slide-up-slow: slide-up 1.5s ease-out;
+
+    --animate-slide-left-right: slide-left-right 1s ease-out;
+    --animate-slide-left-right-fast: slide-left-right 0.5s ease-out;
+    --animate-slide-left-right-slow: slide-left-right 1.5s ease-out;
+
+    --animate-slide-right-left: slide-right-left 1s ease-out;
+    --animate-slide-right-left-fast: slide-right-left 0.5s ease-out;
+    --animate-slide-right-left-slow: slide-right-left 1.5s ease-out;
+
+    --animate-slide-out-left: slide-out-left 1s ease-out;
+    --animate-slide-out-right: slide-out-right 1s ease-out;
+
+    --animate-fade-in: fade-in 1s ease-out;
+    --animate-fade-in-fast: fade-in 0.5s ease-out;
+    --animate-fade-in-slow: fade-in 1.5s ease-out;
+
+    --animate-fade-out: fade-out 1s ease-out;
+    --animate-fade-out-fast: fade-out 0.5s ease-out;
+    --animate-fade-out-slow: fade-out 1.5s ease-out;
+
+    --animate-wiggle: wiggle 1s linear infinite;
+    --animate-wiggle-once: wiggle 1s linear;
+
+    /* keyframes */
+    @keyframes dots {
+        0%, 20% { content: ""; }
+        40% { content: "."; }
+        60% { content: ".."; }
+        80% { content: "..."; }
+        100% { content: ""; }
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+
+    @keyframes ping {
+        0%   { transform: scale(1); opacity: 1; }
+        75%,
+        100% { transform: scale(2); opacity: 0; }
+    }
+
+    @keyframes ping-sm {
+        0%   { transform: scale(1);   opacity: 1; }
+        80%,
+        100% { transform: scale(1.2); opacity: 0; }
+    }
+
+    @keyframes pulse {
+        0%,100% { opacity: 1; }
+        50%     { opacity: .5; }
+    }
+
+    @keyframes bounce {
+        0%,100% {
+            transform: translateY(-25%);
+            animation-timing-function: cubic-bezier(0.8,0,1,1);
+        }
+        50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0,0,0.2,1);
+        }
+    }
+
+    @keyframes wiggle {
+        0%,100% { transform: rotate(-3deg); }
+        50%     { transform: rotate(3deg); }
+    }
+
+    @keyframes slide-up {
+        0%          { transform: translateY(0); }
+        50%,100%    { transform: translateY(-100%); }
+    }
+
+    @keyframes slide-down {
+        0%          { transform: translateY(0); }
+        50%,100%    { transform: translateY(100%); }
+    }
+
+    @keyframes slide-left-right {
+        0%          { transform: translateX(-200%); }
+        50%,100%    { transform: translateX(0); }
+    }
+
+    @keyframes slide-right-left {
+        0%          { transform: translateX(200%); }
+        50%,100%    { transform: translateX(0); }
+    }
+
+    @keyframes slide-out-left {
+        0%          { transform: translateX(0); }
+        50%,100%    { transform: translateX(-200%); }
+    }
+
+    @keyframes slide-out-right {
+        0%          { transform: translateX(0); }
+        50%,100%    { transform: translateX(200%); }
+    }
+
+    @keyframes fade-in {
+        0%          { opacity: 0; }
+        50%,100%    { opacity: 1; }
+    }
+
+    @keyframes fade-out {
+        0%          { opacity: 1; }
+        50%,100%    { opacity: 0; }
+    }
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+    --backdrop-blur: 0.15rem
+}
+
+input,button,submit {
+    border: 1px solid var(--color-gray-700);
+    padding: 0.25rem;
+}
+
+dialog::backdrop {
+    background: rgba(56, 61, 72, 0.75);
+    backdrop-filter: blur(var(--backdrop-blur));
+}
+
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+    --scale: 0;
+    --tooltip-color: #3a4a64;
+    --arrow-size:8px;
+    position: absolute;
+    top: -.25rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(var(--translate-y, 0)) scale(var(--scale));
+    transition: 100ms transform;
+    transform-origin: bottom center;
+}
+
+[data-tooltip]::before {
+    --translate-y: calc(-100% - var(--arrow-size));
+    content: attr(data-tooltip);
+    width: max-content;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: normal;
+    padding: .1rem .7rem;
+    color: #ece7e7;
+    background: var(--tooltip-color);
+    border-radius: .3rem;
+    border: none;
+}
+
+[data-tooltip]::after {
+    --translate-y: calc(-1 * var(--arrow-size) - 1px);
+    content: '';
+    border: var(--arrow-size) solid transparent;
+    border-top-color: var(--tooltip-color);
+    transform-origin: top center;
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after{
+    --scale: 1;
 }
