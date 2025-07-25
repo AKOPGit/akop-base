@@ -1,0 +1,597 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
+diff --git a/app/Exceptions/Auth/LoginException.php b/app/Exceptions/Auth/LoginException.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..aea59fbc6f70eb69af1c4b127d9098ca74b01411
+--- /dev/null
++++ b/app/Exceptions/Auth/LoginException.php
+@@ -0,0 +1,7 @@
++<?php
++
++namespace App\Exceptions\Auth;
++
++use Exception;
++
++class LoginException extends Exception {}
+diff --git a/app/Exceptions/Auth/RegistrationException.php b/app/Exceptions/Auth/RegistrationException.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..c8dd7c098bd2189e1894ecf22de459a4f55bc7a1
+--- /dev/null
++++ b/app/Exceptions/Auth/RegistrationException.php
+@@ -0,0 +1,7 @@
++<?php
++
++namespace App\Exceptions\Auth;
++
++use Exception;
++
++class RegistrationException extends Exception {}
+diff --git a/app/Http/Controllers/Auth/LoginController.php b/app/Http/Controllers/Auth/LoginController.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..ed08d0c33dce8559b9bf36df43b9e9771cd04c79
+--- /dev/null
++++ b/app/Http/Controllers/Auth/LoginController.php
+@@ -0,0 +1,45 @@
++<?php
++
++namespace App\Http\Controllers\Auth;
++
++use App\Exceptions\Auth\LoginException;
++use App\Http\Controllers\Controller;
++use Illuminate\Http\RedirectResponse;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Auth;
++use Illuminate\View\View;
++
++class LoginController extends Controller
++{
++    public function show(): View
++    {
++        return view('auth.login');
++    }
++
++    public function login(Request $request): RedirectResponse
++    {
++        $credentials = $request->validate([
++            'email' => ['required', 'email'],
++            'password' => ['required'],
++        ]);
++
++        $remember = $request->boolean('remember');
++
++        if (! Auth::attempt($credentials, $remember)) {
++            throw new LoginException('Invalid credentials.');
++        }
++
++        $request->session()->regenerate();
++
++        return redirect()->intended('/dashboard');
++    }
++
++    public function logout(Request $request): RedirectResponse
++    {
++        Auth::logout();
++        $request->session()->invalidate();
++        $request->session()->regenerateToken();
++
++        return redirect('/login');
++    }
++}
+diff --git a/app/Http/Controllers/Auth/PasswordResetController.php b/app/Http/Controllers/Auth/PasswordResetController.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..aa3e72b2f0c0f2f0cbaae3cd51727a26df4516d4
+--- /dev/null
++++ b/app/Http/Controllers/Auth/PasswordResetController.php
+@@ -0,0 +1,60 @@
++<?php
++
++namespace App\Http\Controllers\Auth;
++
++use App\Http\Controllers\Controller;
++use Illuminate\Http\RedirectResponse;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Auth;
++use Illuminate\Support\Facades\Password;
++use Illuminate\Support\Str;
++use Illuminate\View\View;
++
++class PasswordResetController extends Controller
++{
++    public function request(): View
++    {
++        return view('auth.forgot-password');
++    }
++
++    public function email(Request $request): RedirectResponse
++    {
++        $request->validate(['email' => ['required', 'email']]);
++
++        $status = Password::sendResetLink($request->only('email'));
++
++        return $status === Password::RESET_LINK_SENT
++            ? back()->with('status', __($status))
++            : back()->withErrors(['email' => __($status)]);
++    }
++
++    public function show(string $token): View
++    {
++        return view('auth.reset-password', ['token' => $token]);
++    }
++
++    public function reset(Request $request): RedirectResponse
++    {
++        $request->validate([
++            'token' => ['required'],
++            'email' => ['required', 'email'],
++            'password' => ['required', 'confirmed', 'min:8'],
++        ]);
++
++        $status = Password::reset(
++            $request->only('email', 'password', 'password_confirmation', 'token'),
++            function ($user) use ($request) {
++                $user->forceFill([
++                    'password' => $request->password,
++                    'remember_token' => Str::random(60),
++                ])->save();
++
++                Auth::login($user);
++            }
++        );
++
++        return $status === Password::PASSWORD_RESET
++            ? redirect()->route('dashboard')
++            : back()->withErrors(['email' => __($status)]);
++    }
++}
+diff --git a/app/Http/Controllers/Auth/RegisterController.php b/app/Http/Controllers/Auth/RegisterController.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..b081d37f52d9326cba571a5f653da8f090a5ada8
+--- /dev/null
++++ b/app/Http/Controllers/Auth/RegisterController.php
+@@ -0,0 +1,44 @@
++<?php
++
++namespace App\Http\Controllers\Auth;
++
++use App\Exceptions\Auth\RegistrationException;
++use App\Http\Controllers\Controller;
++use App\Models\User;
++use Illuminate\Http\RedirectResponse;
++use Illuminate\Http\Request;
++use Illuminate\Support\Facades\Auth;
++use Illuminate\Support\Facades\Hash;
++use Illuminate\Support\Str;
++
++class RegisterController extends Controller
++{
++    public function show(): \Illuminate\View\View
++    {
++        return view('auth.register');
++    }
++
++    public function store(Request $request): RedirectResponse
++    {
++        $validated = $request->validate([
++            'name' => ['required', 'string', 'max:255'],
++            'email' => ['required', 'string', 'email', 'max:255'],
++            'password' => ['required', 'confirmed', 'min:8'],
++        ]);
++
++        if (User::where('email', $validated['email'])->exists()) {
++            throw new RegistrationException('User already exists.');
++        }
++
++        $user = User::create([
++            'name' => $validated['name'],
++            'email' => $validated['email'],
++            'password' => Hash::make($validated['password']),
++            'api_token' => Str::random(60),
++        ]);
++
++        Auth::login($user);
++
++        return redirect()->intended('/dashboard');
++    }
++}
+diff --git a/app/Http/Controllers/DashboardController.php b/app/Http/Controllers/DashboardController.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..cded3884cce8916b19253b3feddd9233002946d9
+--- /dev/null
++++ b/app/Http/Controllers/DashboardController.php
+@@ -0,0 +1,14 @@
++<?php
++
++namespace App\Http\Controllers;
++
++use Illuminate\Support\Facades\Auth;
++use Illuminate\View\View;
++
++class DashboardController extends Controller
++{
++    public function __invoke(): View
++    {
++        return view('dashboard', ['user' => Auth::user()]);
++    }
++}
+diff --git a/app/Models/User.php b/app/Models/User.php
+index 749c7b77d9befa8c8726db91a4ba38ff777cc8ff..8ba5985ee907bbab5e2b57fd972a71c94e4738fd 100644
+--- a/app/Models/User.php
++++ b/app/Models/User.php
+@@ -9,40 +9,41 @@
+
+ class User extends Authenticatable
+ {
+     /** @use HasFactory<\Database\Factories\UserFactory> */
+     use HasFactory, Notifiable;
+
+     /**
+      * The attributes that are mass assignable.
+      *
+      * @var list<string>
+      */
+     protected $fillable = [
+         'name',
+         'email',
+         'password',
+     ];
+
+     /**
+      * The attributes that should be hidden for serialization.
+      *
+      * @var list<string>
+      */
+     protected $hidden = [
+         'password',
+         'remember_token',
++        'api_token',
+     ];
+
+     /**
+      * Get the attributes that should be cast.
+      *
+      * @return array<string, string>
+      */
+     protected function casts(): array
+     {
+         return [
+             'email_verified_at' => 'datetime',
+             'password' => 'hashed',
+         ];
+     }
+ }
+diff --git a/bootstrap/app.php b/bootstrap/app.php
+index 7b162dac3d93adb46face112c9dff5ed8bae3df5..da33920194abbbcf8a3a0b5a46bcc4ddf6a59bbf 100644
+--- a/bootstrap/app.php
++++ b/bootstrap/app.php
+@@ -1,18 +1,19 @@
+ <?php
+
+ use Illuminate\Foundation\Application;
+ use Illuminate\Foundation\Configuration\Exceptions;
+ use Illuminate\Foundation\Configuration\Middleware;
+
+ return Application::configure(basePath: dirname(__DIR__))
+     ->withRouting(
+         web: __DIR__.'/../routes/web.php',
+         commands: __DIR__.'/../routes/console.php',
+         health: '/up',
++        api: __DIR__.'/../routes/api.php',
+     )
+     ->withMiddleware(function (Middleware $middleware) {
+         //
+     })
+     ->withExceptions(function (Exceptions $exceptions) {
+         //
+     })->create();
+diff --git a/config/auth.php b/config/auth.php
+index 0ba5d5d8f10c959d538e1e6ae87aa271d41e1ff0..7d348c1372f2060b7c2fadd9f63835f63b1e71e0 100644
+--- a/config/auth.php
++++ b/config/auth.php
+@@ -18,50 +18,57 @@
+         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+     ],
+
+     /*
+     |--------------------------------------------------------------------------
+     | Authentication Guards
+     |--------------------------------------------------------------------------
+     |
+     | Next, you may define every authentication guard for your application.
+     | Of course, a great default configuration has been defined for you
+     | which utilizes session storage plus the Eloquent user provider.
+     |
+     | All authentication guards have a user provider, which defines how the
+     | users are actually retrieved out of your database or other storage
+     | system used by the application. Typically, Eloquent is utilized.
+     |
+     | Supported: "session"
+     |
+     */
+
+     'guards' => [
+         'web' => [
+             'driver' => 'session',
+             'provider' => 'users',
+         ],
++        'api' => [
++            'driver' => 'token',
++            'provider' => 'users',
++            'input_key' => 'api_token',
++            'storage_key' => 'api_token',
++            'hash' => false,
++        ],
+     ],
+
+     /*
+     |--------------------------------------------------------------------------
+     | User Providers
+     |--------------------------------------------------------------------------
+     |
+     | All authentication guards have a user provider, which defines how the
+     | users are actually retrieved out of your database or other storage
+     | system used by the application. Typically, Eloquent is utilized.
+     |
+     | If you have multiple user tables or models you may configure multiple
+     | providers to represent the model / table. These providers may then
+     | be assigned to any extra authentication guards you have defined.
+     |
+     | Supported: "database", "eloquent"
+     |
+     */
+
+     'providers' => [
+         'users' => [
+             'driver' => 'eloquent',
+             'model' => env('AUTH_MODEL', App\Models\User::class),
+         ],
+
+diff --git a/database/migrations/2025_07_25_132141_add_api_token_to_users_table.php b/database/migrations/2025_07_25_132141_add_api_token_to_users_table.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..8c8e78eac593708a78101fba1b966844c107f3ab
+--- /dev/null
++++ b/database/migrations/2025_07_25_132141_add_api_token_to_users_table.php
+@@ -0,0 +1,31 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    /**
++     * Run the migrations.
++     */
++    public function up(): void
++    {
++        Schema::table('users', function (Blueprint $table) {
++            $table->string('api_token', 80)
++                ->after('remember_token')
++                ->nullable()
++                ->unique();
++        });
++    }
++
++    /**
++     * Reverse the migrations.
++     */
++    public function down(): void
++    {
++        Schema::table('users', function (Blueprint $table) {
++            $table->dropColumn('api_token');
++        });
++    }
++};
+diff --git a/resources/views/auth/forgot-password.blade.php b/resources/views/auth/forgot-password.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..e50c9e162b7538c57726cc34834dc6c931ed0490
+--- /dev/null
++++ b/resources/views/auth/forgot-password.blade.php
+@@ -0,0 +1,24 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Forgot Password</title>
++</head>
++<body>
++<h1>Forgot Password</h1>
++@if ($errors->any())
++    <div>{{ implode(', ', $errors->all()) }}</div>
++@endif
++@if (session('status'))
++    <div>{{ session('status') }}</div>
++@endif
++<form method="POST" action="{{ url('/forgot-password') }}">
++    @csrf
++    <div>
++        <label>Email</label>
++        <input type="email" name="email" value="{{ old('email') }}" required>
++    </div>
++    <button type="submit">Send Reset Link</button>
++</form>
++</body>
++</html>
+diff --git a/resources/views/auth/login.blade.php b/resources/views/auth/login.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..edfff988800518b505988d4f537f6bb8b6c08dab
+--- /dev/null
++++ b/resources/views/auth/login.blade.php
+@@ -0,0 +1,31 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Login</title>
++</head>
++<body>
++<h1>Login</h1>
++@if ($errors->any())
++    <div>{{ implode(', ', $errors->all()) }}</div>
++@endif
++<form method="POST" action="{{ url('/login') }}">
++    @csrf
++    <div>
++        <label>Email</label>
++        <input type="email" name="email" value="{{ old('email') }}" required>
++    </div>
++    <div>
++        <label>Password</label>
++        <input type="password" name="password" required>
++    </div>
++    <div>
++        <label>
++            <input type="checkbox" name="remember"> Remember me
++        </label>
++    </div>
++    <button type="submit">Login</button>
++</form>
++<a href="{{ url('/forgot-password') }}">Forgot your password?</a>
++</body>
++</html>
+diff --git a/resources/views/auth/register.blade.php b/resources/views/auth/register.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..f4cba38414078a5323dc401adcdc3586f945459f
+--- /dev/null
++++ b/resources/views/auth/register.blade.php
+@@ -0,0 +1,34 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Register</title>
++</head>
++<body>
++<h1>Register</h1>
++@if ($errors->any())
++    <div>{{ implode(', ', $errors->all()) }}</div>
++@endif
++<form method="POST" action="{{ url('/register') }}">
++    @csrf
++    <div>
++        <label>Name</label>
++        <input type="text" name="name" value="{{ old('name') }}" required>
++    </div>
++    <div>
++        <label>Email</label>
++        <input type="email" name="email" value="{{ old('email') }}" required>
++    </div>
++    <div>
++        <label>Password</label>
++        <input type="password" name="password" required>
++    </div>
++    <div>
++        <label>Confirm Password</label>
++        <input type="password" name="password_confirmation" required>
++    </div>
++    <button type="submit">Register</button>
++</form>
++<a href="{{ url('/login') }}">Already have an account?</a>
++</body>
++</html>
+diff --git a/resources/views/auth/reset-password.blade.php b/resources/views/auth/reset-password.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..7cc7ab02dd9e1b83d77f0af0f7b352d688744649
+--- /dev/null
++++ b/resources/views/auth/reset-password.blade.php
+@@ -0,0 +1,30 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Reset Password</title>
++</head>
++<body>
++<h1>Reset Password</h1>
++@if ($errors->any())
++    <div>{{ implode(', ', $errors->all()) }}</div>
++@endif
++<form method="POST" action="{{ url('/reset-password') }}">
++    @csrf
++    <input type="hidden" name="token" value="{{ $token }}">
++    <div>
++        <label>Email</label>
++        <input type="email" name="email" value="{{ old('email') }}" required>
++    </div>
++    <div>
++        <label>Password</label>
++        <input type="password" name="password" required>
++    </div>
++    <div>
++        <label>Confirm Password</label>
++        <input type="password" name="password_confirmation" required>
++    </div>
++    <button type="submit">Reset Password</button>
++</form>
++</body>
++</html>
+diff --git a/resources/views/dashboard.blade.php b/resources/views/dashboard.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..7a3b1a88d402cf3a1dd737c73009460d471bda6f
+--- /dev/null
++++ b/resources/views/dashboard.blade.php
+@@ -0,0 +1,14 @@
++<!DOCTYPE html>
++<html lang="en">
++<head>
++    <meta charset="UTF-8">
++    <title>Dashboard</title>
++</head>
++<body>
++<h1>Welcome, {{ $user->name }}</h1>
++<form method="POST" action="{{ url('/logout') }}">
++    @csrf
++    <button type="submit">Logout</button>
++</form>
++</body>
++</html>
+diff --git a/routes/api.php b/routes/api.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..77a594a0bc53b147ba283e6b08c85a11484caeb5
+--- /dev/null
++++ b/routes/api.php
+@@ -0,0 +1,7 @@
++<?php
++
++use Illuminate\Support\Facades\Route;
++
++Route::middleware('auth:api')->get('/user', function (\Illuminate\Http\Request $request) {
++    return $request->user();
++});
+diff --git a/routes/web.php b/routes/web.php
+index 86a06c53eb430eeef17e0fe90f7ba997952a96c6..6dbde56f2fb28f7ee2b341dac197eea7e0631b13 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -1,7 +1,30 @@
+ <?php
+
++use App\Http\Controllers\Auth\LoginController;
++use App\Http\Controllers\Auth\PasswordResetController;
++use App\Http\Controllers\Auth\RegisterController;
++use App\Http\Controllers\DashboardController;
+ use Illuminate\Support\Facades\Route;
+
+ Route::get('/', function () {
+     return view('welcome');
+ });
++
++Route::middleware('guest')->group(function () {
++    Route::get('/login', [LoginController::class, 'show'])->name('login');
++    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:6,1');
++
++    Route::get('/register', [RegisterController::class, 'show']);
++    Route::post('/register', [RegisterController::class, 'store'])->middleware('throttle:6,1');
++
++    Route::get('/forgot-password', [PasswordResetController::class, 'request']);
++    Route::post('/forgot-password', [PasswordResetController::class, 'email'])->middleware('throttle:3,1');
++
++    Route::get('/reset-password/{token}', [PasswordResetController::class, 'show'])->name('password.reset');
++    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
++});
++
++Route::middleware('auth')->group(function () {
++    Route::get('/dashboard', DashboardController::class)->name('dashboard');
++    Route::post('/logout', [LoginController::class, 'logout']);
++});
+
+EOF
+)
