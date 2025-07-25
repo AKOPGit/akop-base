@@ -1,1 +1,1 @@
-import './bootstrap';
+console.log('Olá Mundo!')
