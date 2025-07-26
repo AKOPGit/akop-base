@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 @import './components/checkboxes.css';
 @import './components/radios.css';
 @import './components/scrollbar.css';
