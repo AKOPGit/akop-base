@@ -205,6 +205,9 @@ dialog::backdrop {
 [data-rich-text-editor] .toolbar .toolbar-item {
     @apply p-1.5 text-base text-gray-600 border-1 border-transparent hover:border-gray-200 hover:border-1 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
 }
+[data-rich-text-editor] .toolbar .toolbar-item.active {
+    @apply bg-gray-200 border-gray-200;
+}
 
 /* Remove focus outline from editor */
 [data-rich-text-editor] .editor .ProseMirror:focus,
