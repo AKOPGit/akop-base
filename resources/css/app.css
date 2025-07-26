@@ -202,7 +202,7 @@ dialog::backdrop {
 
 /* Style for rich text editor toolbar */
 [data-rich-text-editor] .toolbar .toolbar-item {
-    @apply rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
+    @apply p-1.5 text-base text-gray-600 border-1 border-transparent hover:border-gray-200 hover:border-1 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
 }
 
 /* Remove focus outline from editor */
