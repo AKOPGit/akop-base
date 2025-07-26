@@ -1,32 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body>
-<h1 class="flex items-center gap-2 text-xl font-bold"><x-heroicon-o-key class="w-6 h-6 text-gray-500"/> Login</h1>
-@if ($errors->any())
-    <div>{{ implode(', ', $errors->all()) }}</div>
-@endif
-<form method="POST" action="{{ url('/login') }}">
-    @csrf
-    <div>
-        <label>Email</label>
-        <input type="email" name="email" value="{{ old('email') }}" required>
-    </div>
-    <div>
-        <label>Password</label>
-        <input type="password" name="password" required>
-    </div>
-    <div>
-        <label>
-            <input type="checkbox" name="remember"> Remember me
-        </label>
-    </div>
-    <button type="submit">Login</button>
-</form>
-<a href="{{ url('/forgot-password') }}">Forgot your password?</a>
-</body>
-</html>
+<x-layouts.form title="Login">
+    <h1 class="flex items-center gap-2 text-xl font-bold"><x-heroicon-o-key class="w-6 h-6 text-gray-500"/> Login</h1>
+    @if ($errors->any())
+        <div>{{ implode(', ', $errors->all()) }}</div>
+    @endif
+
+    <form method="POST" action="{{ url('/login') }}" class="mt-6 space-y-6">
+        @csrf
+
+        <div>
+            <x-forms.label for="email">Email</x-forms.label>
+            <x-forms.input icon-left="heroicon-o-arrow-left" id="email" name="email" type="email" value="{{ old('email') }}" />
+        </div>
+        <div>
+            <x-forms.label for="password">Password</x-forms.label>
+            <x-forms.input id="password" name="password" type="password" />
+        </div>
+        <div class="flex items-center gap-3">
+            <x-forms.checkbox id="remember" name="remember" />
+            <x-forms.label for="remember">Remember me</x-forms.label>
+        </div>
+        <div class="flex items-center justify-between">
+            <a href="{{ url('/forgot-password') }}" class="text-sm font-semibold text-gray-900">Forgot your password?</a>
+            <x-forms.button type="submit">Login</x-forms.button>
+            <x-forms.input-with-button type="password"></x-forms.input-with-button>
+        </div>
+    </form>
+</x-layouts.form>

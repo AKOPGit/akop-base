@@ -1,30 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reset Password</title>
-</head>
-<body>
-<h1>Reset Password</h1>
-@if ($errors->any())
-    <div>{{ implode(', ', $errors->all()) }}</div>
-@endif
-<form method="POST" action="{{ url('/reset-password') }}">
-    @csrf
-    <input type="hidden" name="token" value="{{ $token }}">
-    <div>
-        <label>Email</label>
-        <input type="email" name="email" value="{{ old('email') }}" required>
-    </div>
-    <div>
-        <label>Password</label>
-        <input type="password" name="password" required>
-    </div>
-    <div>
-        <label>Confirm Password</label>
-        <input type="password" name="password_confirmation" required>
-    </div>
-    <button type="submit">Reset Password</button>
-</form>
-</body>
-</html>
+<x-layouts.form title="Reset Password">
+    <h1 class="text-xl font-bold">Reset Password</h1>
+    @if ($errors->any())
+        <div>{{ implode(', ', $errors->all()) }}</div>
+    @endif
+    <form method="POST" action="{{ url('/reset-password') }}" class="mt-6 space-y-6">
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
+        <div>
+            <x-forms.label for="email">Email</x-forms.label>
+            <x-forms.input id="email" name="email" type="email" value="{{ old('email') }}" class="mt-2" />
+        </div>
+        <div>
+            <x-forms.label for="password">Password</x-forms.label>
+            <x-forms.input id="password" name="password" type="password" class="mt-2" />
+        </div>
+        <div>
+            <x-forms.label for="password_confirmation">Confirm Password</x-forms.label>
+            <x-forms.input id="password_confirmation" name="password_confirmation" type="password" class="mt-2" />
+        </div>
+        <x-forms.button type="submit">Reset Password</x-forms.button>
+    </form>
+</x-layouts.form>
