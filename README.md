@@ -77,3 +77,80 @@ stdout_logfile=/var/www/s360/storage/logs/horizon.log
 
 Em seguida rodar `sudo supervisorctl reread
 sudo supervisorctl update`
+
+## Uso de Blade Heroicons
+
+O projeto já inclui o pacote [blade-heroicons](https://github.com/driesvints/blade-heroicons).  
+Para exibir um ícone utilize o componente correspondente:
+
+```blade
+<x-heroicon-o-home class="w-6 h-6 text-gray-500" />
+<x-heroicon-s-user class="w-6 h-6 text-gray-500" />
+```
+
+Consulte o repositório para ver a lista completa de ícones disponíveis.
+
+## Componentes Blade
+
+Os componentes estão localizados em `resources/views/components/forms` e padronizam os elementos de formulário da aplicação. Exemplos de uso:
+
+### `x-forms.input`
+
+Campo de texto com suporte a ícones à esquerda ou à direita:
+
+```blade
+<x-forms.input name="username" :icon-left="'heroicon-o-user'" />
+<x-forms.input name="search" :icon-right="'heroicon-o-magnifying-glass'" />
+```
+
+### `x-forms.input-with-button`
+
+```blade
+<x-forms.input-with-button name="email">
+    <x-slot name="button">
+        <x-forms.button>Enviar</x-forms.button>
+    </x-slot>
+</x-forms.input-with-button>
+```
+
+### `x-forms.button`
+
+Botão estilizado que oferece o atributo `state` para futuras ações assíncronas:
+
+```blade
+<x-forms.button state="idle">Salvar</x-forms.button>
+```
+
+### `x-forms.label`
+
+```blade
+<x-forms.label for="name">Nome</x-forms.label>
+```
+
+### `x-forms.textarea`
+
+```blade
+<x-forms.textarea name="about" rows="3" />
+```
+
+### `x-forms.checkbox`
+
+```blade
+<x-forms.checkbox id="agree" name="agree" />
+<x-forms.label for="agree">Aceito os termos</x-forms.label>
+```
+
+### `x-forms.radio-group` e `x-forms.radio`
+
+```blade
+<x-forms.radio-group>
+    <x-forms.radio name="status" value="yes">Sim</x-forms.radio>
+    <x-forms.radio name="status" value="no">Não</x-forms.radio>
+</x-forms.radio-group>
+```
+
+### `x-forms.file`
+
+```blade
+<x-forms.file id="avatar" name="avatar" />
+```

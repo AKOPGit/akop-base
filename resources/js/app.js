@@ -4,6 +4,7 @@ import * as amigoLeo from './modules/amigo-leo'
 import * as modal from './modules/modal'
 import * as toast from './modules/toast'
 import * as ajaxPost from './modules/ajax-post.js'
+import * as richEditor from './modules/rich-text-editor.js'
 
 import.meta.glob([
     '../img/**',
@@ -13,6 +14,7 @@ import.meta.glob([
 window.globalModules = {
     "mobileMenu": mobileMenu,
     "toggle"    : toggle,
+    "richEditor": richEditor,
 }
 
 /*------------------------------------------------
