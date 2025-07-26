@@ -7,7 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="p-6">
-    <div class="mx-auto max-w-xl">
+    <div class="mx-auto max-w-4xl">
         {{ $slot }}
     </div>
 </body>

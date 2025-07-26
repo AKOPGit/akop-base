@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/typography";
 @import './components/checkboxes.css';
 @import './components/radios.css';
 @import './components/scrollbar.css';
@@ -214,3 +213,40 @@ dialog::backdrop {
 [data-rich-text-editor] .editor .ProseMirror-focused {
     @apply outline-none;
 }
+
+/* Rich text editor styles for .editor */
+[data-rich-text-editor] .editor p {
+    @apply text-gray-700
+}
+[data-rich-text-editor] .editor h1 {
+    @apply text-3xl font-bold mt-6 mb-2 text-gray-800;
+}
+
+[data-rich-text-editor] .editor h2 {
+    @apply text-2xl font-semibold mt-4 mb-2 text-gray-700;
+}
+
+[data-rich-text-editor] .editor h3 {
+    @apply text-xl font-semibold mt-4 mb-2 text-gray-700;
+}
+
+[data-rich-text-editor] .editor ul {
+    @apply list-disc ml-5 mb-4;
+}
+
+[data-rich-text-editor] .editor ol {
+    @apply list-decimal ml-5 mb-4;
+}
+
+[data-rich-text-editor] .editor a {
+    @apply text-blue-600 underline hover:text-blue-800;
+}
+
+[data-rich-text-editor] .editor blockquote {
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
+}
+
+[data-rich-text-editor] .editor pre {
+    @apply bg-gray-100 text-sm font-mono p-4 rounded overflow-x-auto my-4;
+}
+

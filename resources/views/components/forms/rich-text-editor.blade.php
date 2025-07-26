@@ -4,7 +4,7 @@
     $id = $id ?? Str::uuid()->toString();
 @endphp
 <div id="{{ $id }}" data-rich-text-editor class="bg-white border border-gray-300 rounded-md">
-    <div class="toolbar flex flex-wrap mb-2 text-gray-600 bg-gray-50 gap-1.5 p-2">
+    <div class="toolbar flex flex-wrap text-gray-600 bg-gray-50 gap-1.5 p-2">
         <select data-command="heading" class="toolbar-item text-base">
             <option value="0">Parágrafo</option>
             <option value="1">H1</option>
@@ -54,6 +54,6 @@
             <x-heroicon-s-arrow-uturn-right class="w-5 h-5 text-gray-600" />
         </button>
     </div>
-    <div class="editor px-4 prose prose-zinc prose-sm prose-a:text-blue-600"></div>
+    <div class="editor p-4"></div>
 </div>
 <input type="hidden" name="{{ $name }}" value="{{ $value }}" data-editor-target="{{ $id }}">

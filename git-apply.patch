@@ -1,197 +1,38 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
-diff --git a/resources/js/app.js b/resources/js/app.js
-index 85a7e666e9d69edc1a7dcc192bdf5f85d517b377..35a7696722309ff8971e46096b40fb00bfbbe5cc 100644
---- a/resources/js/app.js
-+++ b/resources/js/app.js
-@@ -1,42 +1,46 @@
- import * as mobileMenu from './modules/mobile-menu'
- import * as toggle from './modules/toggle'
- import * as amigoLeo from './modules/amigo-leo'
- import * as modal from './modules/modal'
- import * as toast from './modules/toast'
- import * as ajaxPost from './modules/ajax-post.js'
- import * as richEditor from './modules/rich-text-editor.js'
-+import * as themeSwitch from './modules/theme-switch.js'
-+import * as menuPanel from './modules/menu-panel.js'
-
- import.meta.glob([
-     '../img/**',
-     '../fonts/**',
- ])
-
- window.globalModules = {
-     "mobileMenu": mobileMenu,
-     "toggle"    : toggle,
-     "richEditor": richEditor,
-+    "themeSwitch": themeSwitch,
-+    "menuPanel": menuPanel,
- }
-
- /*------------------------------------------------
-     Triggers after document load
- -------------------------------------------------*/
- document.addEventListener('DOMContentLoaded', () => {
-     initAllModules()
-
-     if (document.keyboardShortcutEventAdded !== true) {
-         let ignoreKeys = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'Alt', 'Shift', 'Meta']
-         document.addEventListener('keydown', (event) => {
-             if (ignoreKeys.indexOf(event.key) <= -1 && event.ctrlKey && event.key === 'b') {
-                 // some action / click / etc
-             }
-
-             if (ignoreKeys.indexOf(event.key) <= -1 && event.key === 'Escape') {
-                 // some action / click / etc
-                 // Example: Modal.close('main-modal')
-             }
-         }, {once: false})
-         document.keyboardShortcutEventAdded = true
-     }
- })
-
- /*------------------------------------------------
-diff --git a/resources/js/modules/menu-panel.js b/resources/js/modules/menu-panel.js
+diff --git a/tailwind.config.js b/tailwind.config.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..21f154e8e920b1575147cf2cbc91bb9124c39f7f
+index 0000000000000000000000000000000000000000..e13780eef4027146c32b75e3af4bd05ef58656a6
 --- /dev/null
-+++ b/resources/js/modules/menu-panel.js
-@@ -0,0 +1,17 @@
-+export function init() {
-+    const toggle = document.getElementById('menu-toggle');
-+    const panel = document.getElementById('menu-panel');
-+    const overlay = document.getElementById('menu-overlay');
-+    if (!toggle || !panel || !overlay) return;
++++ b/tailwind.config.js
+@@ -0,0 +1,28 @@
++import typography from '@tailwindcss/typography'
 +
-+    const close = () => {
-+        panel.classList.add('translate-x-full');
-+        overlay.classList.add('hidden');
-+    }
-+
-+    toggle.addEventListener('click', () => {
-+        panel.classList.toggle('translate-x-full');
-+        overlay.classList.toggle('hidden');
-+    });
-+    overlay.addEventListener('click', close);
++export default {
++  content: [
++    './resources/**/*.blade.php',
++    './resources/**/*.js',
++    './resources/**/*.vue',
++    './storage/framework/views/*.php',
++    './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
++  ],
++  theme: {
++    extend: {
++      typography: {
++        DEFAULT: {
++          css: {
++            'ul > li > p': {
++              marginTop: '0',
++              marginBottom: '0',
++            },
++          },
++        },
++      },
++    },
++  },
++  plugins: [
++    typography,
++  ],
 +}
-diff --git a/resources/js/modules/theme-switch.js b/resources/js/modules/theme-switch.js
-new file mode 100644
-index 0000000000000000000000000000000000000000..6edb255e463389fe032cf4ce0188df66daf85d5b
---- /dev/null
-+++ b/resources/js/modules/theme-switch.js
-@@ -0,0 +1,17 @@
-+export function init() {
-+    const toggle = document.getElementById('theme-switch');
-+    if (!toggle) return;
-+
-+    // initialize from saved preference
-+    const stored = localStorage.getItem('theme');
-+    if (stored === 'dark') {
-+        document.documentElement.classList.add('dark');
-+    }
-+
-+    toggle.addEventListener('click', () => {
-+        const html = document.documentElement;
-+        html.classList.toggle('dark');
-+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
-+        localStorage.setItem('theme', theme);
-+    });
-+}
-diff --git a/resources/views/components/layouts/one-page.blade.php b/resources/views/components/layouts/one-page.blade.php
-new file mode 100644
-index 0000000000000000000000000000000000000000..00f5a8f855498481a550c083a58169b840f5f897
---- /dev/null
-+++ b/resources/views/components/layouts/one-page.blade.php
-@@ -0,0 +1,90 @@
-+@props(['title' => 'My Site'])
-+<!DOCTYPE html>
-+<html lang="en" class="h-full bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-+<head>
-+    <meta charset="UTF-8">
-+    <meta name="viewport" content="width=device-width, initial-scale=1">
-+    <title>{{ $title }}</title>
-+    @vite(['resources/css/app.css', 'resources/js/app.js'])
-+</head>
-+<body class="h-full flex flex-col font-sans">
-+    <header class="bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 backdrop-blur">
-+        <nav class="container mx-auto flex items-center justify-between p-4">
-+            <span class="text-xl font-bold">MyCompany</span>
-+
-+            <ul class="hidden md:flex items-center gap-6">
-+                <li><a href="#" class="hover:text-blue-600">Home</a></li>
-+                <li><a href="#" class="hover:text-blue-600">Blog</a></li>
-+                <li><a href="#" class="hover:text-blue-600">Contato</a></li>
-+                <li><a href="#sobre" class="hover:text-blue-600">Sobre</a></li>
-+                <li class="relative group">
-+                    <button class="flex items-center gap-1 hover:text-blue-600 focus:outline-none">
-+                        Assuntos <x-heroicon-o-chevron-down class="w-4 h-4" />
-+                    </button>
-+                    <ul class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg hidden group-hover:block">
-+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 1</a></li>
-+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 2</a></li>
-+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 3</a></li>
-+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 4</a></li>
-+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 5</a></li>
-+                    </ul>
-+                </li>
-+            </ul>
-+
-+            <div class="flex items-center gap-4">
-+                <button id="menu-toggle" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none">
-+                    <x-heroicon-o-bars-3 class="w-6 h-6" />
-+                </button>
-+                <button id="theme-switch" class="flex items-center text-gray-600 dark:text-gray-300 focus:outline-none">
-+                    <x-heroicon-o-moon class="w-6 h-6 dark:hidden" />
-+                    <x-heroicon-o-sun class="w-6 h-6 hidden dark:inline" />
-+                </button>
-+            </div>
-+        </nav>
-+    </header>
-+
-+    <div id="menu-overlay" class="fixed inset-0 bg-black/50 hidden z-40 md:hidden"></div>
-+    <aside id="menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white dark:bg-gray-800 transform translate-x-full transition-transform duration-200 z-50 p-6 space-y-4 md:hidden">
-+        <ul class="space-y-2">
-+            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Home</a></li>
-+            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Blog</a></li>
-+            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Contato</a></li>
-+            <li><a href="#sobre" class="block py-2 border-b border-gray-200 dark:border-gray-700">Sobre</a></li>
-+            <li>
-+                <span class="block py-2 font-semibold">Assuntos</span>
-+                <ul class="ml-4 space-y-1">
-+                    <li><a href="#" class="block py-1">Item 1</a></li>
-+                    <li><a href="#" class="block py-1">Item 2</a></li>
-+                    <li><a href="#" class="block py-1">Item 3</a></li>
-+                    <li><a href="#" class="block py-1">Item 4</a></li>
-+                    <li><a href="#" class="block py-1">Item 5</a></li>
-+                </ul>
-+            </li>
-+        </ul>
-+    </aside>
-+    <main class="flex-grow">
-+        <!-- Hero -->
-+        <section class="relative py-20 bg-gray-50 dark:bg-gray-800">
-+            <div class="container mx-auto px-4 text-center">
-+                <h1 class="text-4xl font-extrabold mb-4">Bem-vindo ao nosso site</h1>
-+                <p class="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">Uma pagina simples inspirada em exemplos modernos de marketing com suporte a modo escuro.</p>
-+                <a href="#sobre" class="mt-8 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Saiba mais</a>
-+            </div>
-+        </section>
-+        <!-- About -->
-+        <section id="sobre" class="py-20 container mx-auto px-4">
-+            <div class="grid md:grid-cols-2 gap-8 items-center">
-+                <div>
-+                    <h2 class="text-3xl font-bold mb-4">Sobre nós</h2>
-+                    <p class="text-gray-600 dark:text-gray-300 mb-4">Construímos experiências digitais leves e acessíveis. Este layout usa Tailwind CSS para oferecer um visual limpo e responsivo.</p>
-+                    <p class="text-gray-600 dark:text-gray-300">Explore componentes reutilizáveis e o modo claro/escuro para personalizar sua aplicação.</p>
-+                </div>
-+                <div class="aspect-video bg-gray-200 dark:bg-gray-700 rounded"></div>
-+            </div>
-+        </section>
-+    </main>
-+    <footer class="bg-gray-100 dark:bg-gray-800 text-center p-4">
-+        &copy; {{ date('Y') }} MyCompany. Todos os direitos reservados.
-+    </footer>
-+</body>
-+</html>
 
 EOF
 )
