@@ -44,6 +44,6 @@
         <button type="button" data-command="undo" class="toolbar-item">↶</button>
         <button type="button" data-command="redo" class="toolbar-item">↷</button>
     </div>
-    <div class="editor p-2 prose"></div>
+    <div class="editor px-4 prose prose-zinc prose-sm prose-a:text-blue-600"></div>
 </div>
 <input type="hidden" name="{{ $name }}" value="{{ $value }}" data-editor-target="{{ $id }}">
