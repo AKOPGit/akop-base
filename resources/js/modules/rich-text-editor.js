@@ -208,12 +208,13 @@ function getCurrentBlockType(view, schema) {
 function getHTML(doc, schema) {
     const div = document.createElement('div')
     div.appendChild(DOMSerializer.fromSchema(schema).serializeFragment(doc.content))
-    div.querySelectorAll('li > p:only-child').forEach(p => {
-        const li = p.parentNode
-        while(p.firstChild) li.insertBefore(p.firstChild, p)
-        li.removeChild(p)
-    })
+    div.querySelectorAll('br.ProseMirror-trailingBreak').forEach(br => br.remove())
     div.querySelectorAll('li').forEach(li => {
+        const p = li.querySelector(':scope > p')
+        if(p && li.children.length === 1){
+            while(p.firstChild) li.insertBefore(p.firstChild, p)
+            li.removeChild(p)
+        }
         if(li.textContent.trim() === '' && li.querySelector('br')){
             li.remove()
         }
@@ -270,7 +271,7 @@ function updateToolbar(container, schema, view){
     const italicBtn = container.querySelector('[data-command="italic"]')
     const underlineBtn = container.querySelector('[data-command="underline"]')
     const strikeBtn = container.querySelector('[data-command="strike"]')
-    
+
     boldBtn.classList.toggle('active', markActive(schema.marks.strong))
     italicBtn.classList.toggle('active', markActive(schema.marks.em))
     underlineBtn.classList.toggle('active', markActive(schema.marks.underline))

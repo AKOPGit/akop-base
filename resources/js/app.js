@@ -5,6 +5,8 @@ import * as modal from './modules/modal'
 import * as toast from './modules/toast'
 import * as ajaxPost from './modules/ajax-post.js'
 import * as richEditor from './modules/rich-text-editor.js'
+import * as themeSwitch from './modules/theme-switch.js'
+import * as menuPanel from './modules/menu-panel.js'
 
 import.meta.glob([
     '../img/**',
@@ -15,6 +17,8 @@ window.globalModules = {
     "mobileMenu": mobileMenu,
     "toggle"    : toggle,
     "richEditor": richEditor,
+    "themeSwitch": themeSwitch,
+    "menuPanel": menuPanel,
 }
 
 /*------------------------------------------------

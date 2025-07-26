@@ -1,107 +1,197 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
-diff --git a/resources/js/modules/rich-text-editor.js b/resources/js/modules/rich-text-editor.js
-index 6659e1585491c507ac8d4b8df4faa5c8754fc8b5..847df9c2d20e367126e1356323f71b619ea4b601 100644
---- a/resources/js/modules/rich-text-editor.js
-+++ b/resources/js/modules/rich-text-editor.js
-@@ -1,33 +1,33 @@
- import {EditorState} from 'prosemirror-state'
- import {EditorView} from 'prosemirror-view'
- import {Schema, DOMParser as ProseParser, DOMSerializer} from 'prosemirror-model'
- import {schema as basicSchema} from 'prosemirror-schema-basic'
- import {addListNodes, wrapInList} from 'prosemirror-schema-list'
- import {history, undo, redo} from 'prosemirror-history'
- import {keymap} from 'prosemirror-keymap'
--import {baseKeymap, toggleMark, setBlockType, wrapIn} from 'prosemirror-commands'
-+import {baseKeymap, toggleMark, setBlockType, wrapIn, chainCommands, exitCode} from 'prosemirror-commands'
- import {inputRules, textblockTypeInputRule} from 'prosemirror-inputrules'
+diff --git a/resources/js/app.js b/resources/js/app.js
+index 85a7e666e9d69edc1a7dcc192bdf5f85d517b377..35a7696722309ff8971e46096b40fb00bfbbe5cc 100644
+--- a/resources/js/app.js
++++ b/resources/js/app.js
+@@ -1,42 +1,46 @@
+ import * as mobileMenu from './modules/mobile-menu'
+ import * as toggle from './modules/toggle'
+ import * as amigoLeo from './modules/amigo-leo'
+ import * as modal from './modules/modal'
+ import * as toast from './modules/toast'
+ import * as ajaxPost from './modules/ajax-post.js'
+ import * as richEditor from './modules/rich-text-editor.js'
++import * as themeSwitch from './modules/theme-switch.js'
++import * as menuPanel from './modules/menu-panel.js'
 
- const underline = {
-     parseDOM: [{tag: 'u'}, {style: 'text-decoration=underline'}],
-     toDOM() { return ['u', 0] }
+ import.meta.glob([
+     '../img/**',
+     '../fonts/**',
+ ])
+
+ window.globalModules = {
+     "mobileMenu": mobileMenu,
+     "toggle"    : toggle,
+     "richEditor": richEditor,
++    "themeSwitch": themeSwitch,
++    "menuPanel": menuPanel,
  }
 
- const strike = {
-     parseDOM: [{tag: 's'}, {tag: 'del'}, {style: 'text-decoration=line-through'}],
-     toDOM() { return ['s', 0] }
- }
+ /*------------------------------------------------
+     Triggers after document load
+ -------------------------------------------------*/
+ document.addEventListener('DOMContentLoaded', () => {
+     initAllModules()
 
- export function init() {
-     document.querySelectorAll('[data-rich-text-editor]').forEach(container => {
-         if (container.editor) return
-         const targetId = container.id
-         const hidden = document.querySelector(`[data-editor-target="${targetId}"]`)
-         const value = hidden ? hidden.value : ''
-
-         const nodes = addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block')
-             .update('paragraph', {
-                 content: 'inline*',
-                 group: 'block',
-                 attrs: {align: {default: 'left'}},
-                 parseDOM: [{tag: 'p', getAttrs: dom => ({align: dom.style.textAlign || 'left'})}],
-@@ -40,50 +40,63 @@ export function init() {
-                 attrs: {level: {default: 1}, align: {default: 'left'}},
-                 parseDOM: [
-                     {tag: 'h1', getAttrs: dom => ({level:1, align: dom.style.textAlign || 'left'})},
-                     {tag: 'h2', getAttrs: dom => ({level:2, align: dom.style.textAlign || 'left'})},
-                     {tag: 'h3', getAttrs: dom => ({level:3, align: dom.style.textAlign || 'left'})},
-                     {tag: 'h4', getAttrs: dom => ({level:4, align: dom.style.textAlign || 'left'})},
-                     {tag: 'h5', getAttrs: dom => ({level:5, align: dom.style.textAlign || 'left'})},
-                     {tag: 'h6', getAttrs: dom => ({level:6, align: dom.style.textAlign || 'left'})},
-                 ],
-                 toDOM(node) { return ['h'+node.attrs.level, {style: `text-align:${node.attrs.align}`}, 0] }
-             })
-
-         const marks = basicSchema.spec.marks
-             .addBefore('link', 'underline', underline)
-             .addToEnd('strike', strike)
-
-         const schema = new Schema({nodes, marks})
-
-         const parser = new DOMParser()
-         const content = parser.parseFromString(value || '<p></p>', 'text/html')
-         const state = EditorState.create({
-             doc: ProseParser.fromSchema(schema).parse(content.body),
-             plugins: [
-                 history(),
-                 inputRules({rules: buildInputRules(schema)}),
-+                keymap({
-+                    'Shift-Enter': chainCommands(
-+                        exitCode,
-+                        (state, dispatch) => {
-+                            dispatch(
-+                                state.tr.replaceSelectionWith(
-+                                    state.schema.nodes.hard_break.create()
-+                                ).scrollIntoView()
-+                            )
-+                            return true
-+                        }
-+                    )
-+                }),
-                 keymap(baseKeymap)
-             ]
-         })
-
-         const view = new EditorView(container.querySelector('.editor'), {
-             state,
-             dispatchTransaction(tr){
-                 const newState = view.state.apply(tr)
-                 view.updateState(newState)
-                 if(hidden){
-                     hidden.value = getHTML(view.state.doc, schema)
-                 }
+     if (document.keyboardShortcutEventAdded !== true) {
+         let ignoreKeys = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'Alt', 'Shift', 'Meta']
+         document.addEventListener('keydown', (event) => {
+             if (ignoreKeys.indexOf(event.key) <= -1 && event.ctrlKey && event.key === 'b') {
+                 // some action / click / etc
              }
-         })
 
-         setupToolbar(container, schema, view)
-         container.editor = view
-     })
- }
+             if (ignoreKeys.indexOf(event.key) <= -1 && event.key === 'Escape') {
+                 // some action / click / etc
+                 // Example: Modal.close('main-modal')
+             }
+         }, {once: false})
+         document.keyboardShortcutEventAdded = true
+     }
+ })
 
- function setupToolbar(container, schema, view){
-     container.querySelectorAll('[data-command]').forEach(btn => {
-         const cmd = btn.getAttribute('data-command')
-         if(cmd === 'heading'){
-             btn.addEventListener('change', e => {
+ /*------------------------------------------------
+diff --git a/resources/js/modules/menu-panel.js b/resources/js/modules/menu-panel.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..21f154e8e920b1575147cf2cbc91bb9124c39f7f
+--- /dev/null
++++ b/resources/js/modules/menu-panel.js
+@@ -0,0 +1,17 @@
++export function init() {
++    const toggle = document.getElementById('menu-toggle');
++    const panel = document.getElementById('menu-panel');
++    const overlay = document.getElementById('menu-overlay');
++    if (!toggle || !panel || !overlay) return;
++
++    const close = () => {
++        panel.classList.add('translate-x-full');
++        overlay.classList.add('hidden');
++    }
++
++    toggle.addEventListener('click', () => {
++        panel.classList.toggle('translate-x-full');
++        overlay.classList.toggle('hidden');
++    });
++    overlay.addEventListener('click', close);
++}
+diff --git a/resources/js/modules/theme-switch.js b/resources/js/modules/theme-switch.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..6edb255e463389fe032cf4ce0188df66daf85d5b
+--- /dev/null
++++ b/resources/js/modules/theme-switch.js
+@@ -0,0 +1,17 @@
++export function init() {
++    const toggle = document.getElementById('theme-switch');
++    if (!toggle) return;
++
++    // initialize from saved preference
++    const stored = localStorage.getItem('theme');
++    if (stored === 'dark') {
++        document.documentElement.classList.add('dark');
++    }
++
++    toggle.addEventListener('click', () => {
++        const html = document.documentElement;
++        html.classList.toggle('dark');
++        const theme = html.classList.contains('dark') ? 'dark' : 'light';
++        localStorage.setItem('theme', theme);
++    });
++}
+diff --git a/resources/views/components/layouts/one-page.blade.php b/resources/views/components/layouts/one-page.blade.php
+new file mode 100644
+index 0000000000000000000000000000000000000000..00f5a8f855498481a550c083a58169b840f5f897
+--- /dev/null
++++ b/resources/views/components/layouts/one-page.blade.php
+@@ -0,0 +1,90 @@
++@props(['title' => 'My Site'])
++<!DOCTYPE html>
++<html lang="en" class="h-full bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
++<head>
++    <meta charset="UTF-8">
++    <meta name="viewport" content="width=device-width, initial-scale=1">
++    <title>{{ $title }}</title>
++    @vite(['resources/css/app.css', 'resources/js/app.js'])
++</head>
++<body class="h-full flex flex-col font-sans">
++    <header class="bg-white/80 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 backdrop-blur">
++        <nav class="container mx-auto flex items-center justify-between p-4">
++            <span class="text-xl font-bold">MyCompany</span>
++
++            <ul class="hidden md:flex items-center gap-6">
++                <li><a href="#" class="hover:text-blue-600">Home</a></li>
++                <li><a href="#" class="hover:text-blue-600">Blog</a></li>
++                <li><a href="#" class="hover:text-blue-600">Contato</a></li>
++                <li><a href="#sobre" class="hover:text-blue-600">Sobre</a></li>
++                <li class="relative group">
++                    <button class="flex items-center gap-1 hover:text-blue-600 focus:outline-none">
++                        Assuntos <x-heroicon-o-chevron-down class="w-4 h-4" />
++                    </button>
++                    <ul class="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg hidden group-hover:block">
++                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 1</a></li>
++                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 2</a></li>
++                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 3</a></li>
++                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 4</a></li>
++                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Item 5</a></li>
++                    </ul>
++                </li>
++            </ul>
++
++            <div class="flex items-center gap-4">
++                <button id="menu-toggle" class="md:hidden text-gray-600 dark:text-gray-300 focus:outline-none">
++                    <x-heroicon-o-bars-3 class="w-6 h-6" />
++                </button>
++                <button id="theme-switch" class="flex items-center text-gray-600 dark:text-gray-300 focus:outline-none">
++                    <x-heroicon-o-moon class="w-6 h-6 dark:hidden" />
++                    <x-heroicon-o-sun class="w-6 h-6 hidden dark:inline" />
++                </button>
++            </div>
++        </nav>
++    </header>
++
++    <div id="menu-overlay" class="fixed inset-0 bg-black/50 hidden z-40 md:hidden"></div>
++    <aside id="menu-panel" class="fixed top-0 right-0 h-full w-64 bg-white dark:bg-gray-800 transform translate-x-full transition-transform duration-200 z-50 p-6 space-y-4 md:hidden">
++        <ul class="space-y-2">
++            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Home</a></li>
++            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Blog</a></li>
++            <li><a href="#" class="block py-2 border-b border-gray-200 dark:border-gray-700">Contato</a></li>
++            <li><a href="#sobre" class="block py-2 border-b border-gray-200 dark:border-gray-700">Sobre</a></li>
++            <li>
++                <span class="block py-2 font-semibold">Assuntos</span>
++                <ul class="ml-4 space-y-1">
++                    <li><a href="#" class="block py-1">Item 1</a></li>
++                    <li><a href="#" class="block py-1">Item 2</a></li>
++                    <li><a href="#" class="block py-1">Item 3</a></li>
++                    <li><a href="#" class="block py-1">Item 4</a></li>
++                    <li><a href="#" class="block py-1">Item 5</a></li>
++                </ul>
++            </li>
++        </ul>
++    </aside>
++    <main class="flex-grow">
++        <!-- Hero -->
++        <section class="relative py-20 bg-gray-50 dark:bg-gray-800">
++            <div class="container mx-auto px-4 text-center">
++                <h1 class="text-4xl font-extrabold mb-4">Bem-vindo ao nosso site</h1>
++                <p class="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">Uma pagina simples inspirada em exemplos modernos de marketing com suporte a modo escuro.</p>
++                <a href="#sobre" class="mt-8 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Saiba mais</a>
++            </div>
++        </section>
++        <!-- About -->
++        <section id="sobre" class="py-20 container mx-auto px-4">
++            <div class="grid md:grid-cols-2 gap-8 items-center">
++                <div>
++                    <h2 class="text-3xl font-bold mb-4">Sobre nós</h2>
++                    <p class="text-gray-600 dark:text-gray-300 mb-4">Construímos experiências digitais leves e acessíveis. Este layout usa Tailwind CSS para oferecer um visual limpo e responsivo.</p>
++                    <p class="text-gray-600 dark:text-gray-300">Explore componentes reutilizáveis e o modo claro/escuro para personalizar sua aplicação.</p>
++                </div>
++                <div class="aspect-video bg-gray-200 dark:bg-gray-700 rounded"></div>
++            </div>
++        </section>
++    </main>
++    <footer class="bg-gray-100 dark:bg-gray-800 text-center p-4">
++        &copy; {{ date('Y') }} MyCompany. Todos os direitos reservados.
++    </footer>
++</body>
++</html>
 
 EOF
 )
