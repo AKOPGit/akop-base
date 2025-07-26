@@ -25,16 +25,40 @@ const strike = {
 
 export function init() {
     document.querySelectorAll('[data-rich-text-editor]').forEach(container => {
-            if (container.editor) return
-            const targetId = container.id
-            const hidden   = document.querySelector(`[data-editor-target="${targetId}"]`)
-            const value    = hidden ? hidden.value : ''
+        if (container.editor) return
+        const targetId = container.id
+        const hidden = document.querySelector(`[data-editor-target="${targetId}"]`)
+        const value = hidden ? hidden.value : ''
+
+        const nodeSpecs = addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block')
+            .update('paragraph', {
+                content: 'inline*',
+                group: 'block',
+                attrs: {align: {default: 'left'}},
+                parseDOM: [{tag: 'p', getAttrs: dom => ({align: dom.style.textAlign || 'left'})}],
+                toDOM(node) { return ['p', {style: `text-align:${node.attrs.align}`}, 0] }
+            })
+            .update('heading', {
+                content: 'inline*',
+                group: 'block',
+                defining: true,
+                attrs: {level: {default: 1}, align: {default: 'left'}},
+                parseDOM: [
+                    {tag: 'h1', getAttrs: dom => ({level:1, align: dom.style.textAlign || 'left'})},
+                    {tag: 'h2', getAttrs: dom => ({level:2, align: dom.style.textAlign || 'left'})},
+                    {tag: 'h3', getAttrs: dom => ({level:3, align: dom.style.textAlign || 'left'})},
+                    {tag: 'h4', getAttrs: dom => ({level:4, align: dom.style.textAlign || 'left'})},
+                    {tag: 'h5', getAttrs: dom => ({level:5, align: dom.style.textAlign || 'left'})},
+                    {tag: 'h6', getAttrs: dom => ({level:6, align: dom.style.textAlign || 'left'})},
+                ],
+                toDOM(node) { return ['h'+node.attrs.level, {style: `text-align:${node.attrs.align}`}, 0] }
+            })
 
         const marks = basicSchema.spec.marks
             .addBefore('link', 'underline', underline)
             .addToEnd('strike', strike)
 
-        const schema = new Schema({nodes, marks})
+        const schema = new Schema({nodes: nodeSpecs, marks})
 
         const parser = new DOMParser()
         const content = parser.parseFromString(value || '<p></p>', 'text/html')
@@ -197,10 +221,10 @@ function getHTML(doc, schema) {
     return div.innerHTML
 }
 
-function markInputRule(regexp, markType) {
+function markInputRule(regexp, markType){
     return new InputRule(regexp, (state, match, start, end) => {
         const text = match[1]
-        if (!text) return null
+        if(!text) return null
         const tr = state.tr
         tr.insertText(text, start, end)
         tr.addMark(start, start + text.length, markType.create())
@@ -246,7 +270,7 @@ function updateToolbar(container, schema, view){
     const italicBtn = container.querySelector('[data-command="italic"]')
     const underlineBtn = container.querySelector('[data-command="underline"]')
     const strikeBtn = container.querySelector('[data-command="strike"]')
-
+    
     boldBtn.classList.toggle('active', markActive(schema.marks.strong))
     italicBtn.classList.toggle('active', markActive(schema.marks.em))
     underlineBtn.classList.toggle('active', markActive(schema.marks.underline))
