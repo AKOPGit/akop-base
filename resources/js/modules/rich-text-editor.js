@@ -5,8 +5,9 @@ import {schema as basicSchema} from 'prosemirror-schema-basic'
 import {addListNodes, wrapInList} from 'prosemirror-schema-list'
 import {history, undo, redo} from 'prosemirror-history'
 import {keymap} from 'prosemirror-keymap'
-import {baseKeymap, toggleMark, setBlockType, wrapIn} from 'prosemirror-commands'
-import {inputRules, textblockTypeInputRule} from 'prosemirror-inputrules'
+import {Plugin} from 'prosemirror-state'
+import {baseKeymap, toggleMark, setBlockType, wrapIn, chainCommands, exitCode} from 'prosemirror-commands'
+import {inputRules, textblockTypeInputRule, wrappingInputRule, InputRule, smartQuotes, ellipsis, emDash} from 'prosemirror-inputrules'
 
 const underline = {
     parseDOM: [{tag: 'u'}, {style: 'text-decoration=underline'}],
@@ -62,6 +63,28 @@ export function init() {
             plugins: [
                 history(),
                 inputRules({rules: buildInputRules(schema)}),
+                trailingParagraphPlugin(schema.nodes.paragraph),
+                keymap({
+                    'Shift-Enter': chainCommands(
+                        exitCode,
+                        (state, dispatch) => {
+                            dispatch(
+                                state.tr.replaceSelectionWith(
+                                    state.schema.nodes.hard_break.create()
+                                ).scrollIntoView()
+                            )
+                            return true
+                        }
+                    ),
+                    'Mod-b': toggleMark(schema.marks.strong),
+                    'Mod-i': toggleMark(schema.marks.em),
+                    'Mod-u': toggleMark(schema.marks.underline),
+                    'Mod-Shift-s': toggleMark(schema.marks.strike),
+                    'Mod-0': setBlockType(schema.nodes.paragraph),
+                    'Mod-z': undo,
+                    'Mod-y': redo,
+                    'Shift-Mod-z': redo
+                }),
                 keymap(baseKeymap)
             ]
         })
@@ -74,10 +97,12 @@ export function init() {
                 if(hidden){
                     hidden.value = getHTML(view.state.doc, schema)
                 }
+                updateToolbar(container, schema, view)
             }
         })
 
         setupToolbar(container, schema, view)
+        updateToolbar(container, schema, view)
         container.editor = view
     })
 }
@@ -171,10 +196,65 @@ function getHTML(doc, schema){
     return div.innerHTML
 }
 
+function markInputRule(regexp, markType){
+    return new InputRule(regexp, (state, match, start, end) => {
+        const text = match[1]
+        if(!text) return null
+        const tr = state.tr
+        tr.insertText(text, start, end)
+        tr.addMark(start, start + text.length, markType.create())
+        tr.removeStoredMark(markType)
+        return tr
+    })
+}
+
 function buildInputRules(schema){
-    const rules = []
-    if(schema.nodes.heading){
-        rules.push(textblockTypeInputRule(/^(#{1,6})\s$/, schema.nodes.heading, match => ({level: match[1].length})) )
-    }
+    const rules = smartQuotes.concat(ellipsis, emDash)
+    let type
+    if(type = schema.nodes.blockquote) rules.push(wrappingInputRule(/^\s*>\s$/, type))
+    if(type = schema.nodes.ordered_list) rules.push(wrappingInputRule(/^(\d+)\.\s$/, type, match => ({order: +match[1]}), (match, node) => node.childCount + node.attrs.order == +match[1]))
+    if(type = schema.nodes.bullet_list) rules.push(wrappingInputRule(/^\s*([-+*])\s$/, type))
+    if(type = schema.nodes.code_block) rules.push(textblockTypeInputRule(/^```$/, type))
+    if(type = schema.nodes.heading) rules.push(textblockTypeInputRule(/^(#{1,6})\s$/, type, match => ({level: match[1].length})))
+    if(type = schema.marks.strong) rules.push(markInputRule(/\*\*([^*]+)\*\*$/, type))
+    if(type = schema.marks.em) rules.push(markInputRule(/\*([^*]+)\*$/, type))
+    if(type = schema.marks.underline) rules.push(markInputRule(/__([^_]+)__$/, type))
+    if(type = schema.marks.strike) rules.push(markInputRule(/~~([^~]+)~~$/, type))
     return rules
+}
+
+function trailingParagraphPlugin(nodeType){
+    return new Plugin({
+        appendTransaction(transactions, oldState, newState){
+            if(!transactions.some(tr => tr.docChanged)) return null
+            const last = newState.doc.lastChild
+            if(!last || last.type !== nodeType){
+                return newState.tr.insert(newState.doc.content.size, nodeType.create())
+            }
+        }
+    })
+}
+
+function updateToolbar(container, schema, view){
+    const state = view.state
+    const {from} = state.selection
+    const marks = state.storedMarks || state.doc.resolve(from).marks()
+    const markActive = type => marks.some(m => m.type === type)
+
+    const boldBtn = container.querySelector('[data-command="bold"]')
+    const italicBtn = container.querySelector('[data-command="italic"]')
+    const underlineBtn = container.querySelector('[data-command="underline"]')
+    const strikeBtn = container.querySelector('[data-command="strike"]')
+    boldBtn.classList.toggle('active', markActive(schema.marks.strong))
+    italicBtn.classList.toggle('active', markActive(schema.marks.em))
+    underlineBtn.classList.toggle('active', markActive(schema.marks.underline))
+    strikeBtn.classList.toggle('active', markActive(schema.marks.strike))
+
+    const select = container.querySelector('[data-command="heading"]')
+    const block = state.selection.$from.parent
+    if(block.type === schema.nodes.heading){
+        select.value = String(block.attrs.level)
+    }else{
+        select.value = '0'
+    }
 }
