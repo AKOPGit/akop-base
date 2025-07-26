@@ -9,6 +9,7 @@ import {Plugin} from 'prosemirror-state'
 import {baseKeymap, toggleMark, setBlockType, wrapIn, chainCommands, exitCode} from 'prosemirror-commands'
 import {inputRules, textblockTypeInputRule, wrappingInputRule, InputRule, smartQuotes, ellipsis, emDash} from 'prosemirror-inputrules'
 
+
 const underline = {
     parseDOM: [{tag: 'u'}, {style: 'text-decoration=underline'}],
     toDOM() { return ['u', 0] }
@@ -84,6 +85,7 @@ export function init() {
                     'Mod-z': undo,
                     'Mod-y': redo,
                     'Shift-Mod-z': redo
+                    )
                 }),
                 keymap(baseKeymap)
             ]

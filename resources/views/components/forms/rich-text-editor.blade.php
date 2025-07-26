@@ -29,9 +29,15 @@
         <button type="button" data-command="ordered" class="toolbar-item">
             <x-heroicon-s-numbered-list class="w-5 h-5 text-gray-600" />
         </button>
-        <button type="button" data-command="blockquote" class="toolbar-item">"</button>
-        <button type="button" data-command="code" class="toolbar-item">{ }</button>
-        <button type="button" data-command="link" class="toolbar-item">🔗</button>
+        <button type="button" data-command="blockquote" class="toolbar-item">
+            <x-heroicon-s-chat-bubble-oval-left-ellipsis class="w-5 h-5 text-gray-600" />
+        </button>
+        <button type="button" data-command="code" class="toolbar-item">
+            <x-heroicon-s-code-bracket class="w-5 h-5 text-gray-600" />
+        </button>
+        <button type="button" data-command="link" class="toolbar-item">
+            <x-heroicon-s-link class="w-5 h-5 text-gray-600" />
+        </button>
         <button type="button" data-command="align-left" class="toolbar-item">
             <x-heroicon-s-bars-3-bottom-left class="w-5 h-5 text-gray-600" />
         </button>
@@ -41,8 +47,12 @@
         <button type="button" data-command="align-right" class="toolbar-item">
             <x-heroicon-s-bars-3-bottom-right class="w-5 h-5 text-gray-600" />
         </button>
-        <button type="button" data-command="undo" class="toolbar-item">↶</button>
-        <button type="button" data-command="redo" class="toolbar-item">↷</button>
+        <button type="button" data-command="undo" class="toolbar-item">
+            <x-heroicon-s-arrow-uturn-left class="w-5 h-5 text-gray-600" />
+        </button>
+        <button type="button" data-command="redo" class="toolbar-item">
+            <x-heroicon-s-arrow-uturn-right class="w-5 h-5 text-gray-600" />
+        </button>
     </div>
     <div class="editor px-4 prose prose-zinc prose-sm prose-a:text-blue-600"></div>
 </div>
