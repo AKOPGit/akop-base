@@ -2,7 +2,7 @@ import {EditorState} from 'prosemirror-state'
 import {EditorView} from 'prosemirror-view'
 import {Schema, DOMParser as ProseParser, DOMSerializer} from 'prosemirror-model'
 import {schema as basicSchema} from 'prosemirror-schema-basic'
-import {addListNodes, wrapInList} from 'prosemirror-schema-list'
+import {addListNodes, wrapInList, splitListItem} from 'prosemirror-schema-list'
 import {history, undo, redo} from 'prosemirror-history'
 import {keymap} from 'prosemirror-keymap'
 import {Plugin} from 'prosemirror-state'
@@ -82,6 +82,7 @@ export function init() {
                           inputRules({rules: buildInputRules(schema)}),
                           trailingParagraphPlugin(schema.nodes.paragraph),
                           keymap({
+                              'Enter': splitListItem(schema.nodes.list_item),
                               'Shift-Enter': chainCommands(
                                   exitCode,
                                   (state, dispatch) => {
