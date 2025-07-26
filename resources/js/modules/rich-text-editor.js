@@ -5,7 +5,7 @@ import {schema as basicSchema} from 'prosemirror-schema-basic'
 import {addListNodes, wrapInList} from 'prosemirror-schema-list'
 import {history, undo, redo} from 'prosemirror-history'
 import {keymap} from 'prosemirror-keymap'
-import {baseKeymap, toggleMark, setBlockType, wrapIn} from 'prosemirror-commands'
+import {baseKeymap, toggleMark, setBlockType, wrapIn, chainCommands, exitCode} from 'prosemirror-commands'
 import {inputRules, textblockTypeInputRule} from 'prosemirror-inputrules'
 
 const underline = {
@@ -62,6 +62,19 @@ export function init() {
             plugins: [
                 history(),
                 inputRules({rules: buildInputRules(schema)}),
+                keymap({
+                    'Shift-Enter': chainCommands(
+                        exitCode,
+                        (state, dispatch) => {
+                            dispatch(
+                                state.tr.replaceSelectionWith(
+                                    state.schema.nodes.hard_break.create()
+                                ).scrollIntoView()
+                            )
+                            return true
+                        }
+                    )
+                }),
                 keymap(baseKeymap)
             ]
         })
