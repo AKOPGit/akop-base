@@ -1,655 +1,91 @@
  (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF'
-diff --git a/package-lock.json b/package-lock.json
-index ac404f10d42379ceaadc587a2c93440ae45aecd7..8189fa791875866da6b90e56d3353b065515b833 100644
---- a/package-lock.json
-+++ b/package-lock.json
-@@ -1,31 +1,41 @@
- {
-     "name": "akop-base",
-     "lockfileVersion": 3,
-     "requires": true,
-     "packages": {
-         "": {
-+            "dependencies": {
-+                "prosemirror-commands": "^1.7.1",
-+                "prosemirror-history": "^1.4.1",
-+                "prosemirror-keymap": "^1.2.3",
-+                "prosemirror-model": "^1.25.2",
-+                "prosemirror-schema-basic": "^1.2.4",
-+                "prosemirror-schema-list": "^1.5.1",
-+                "prosemirror-state": "^1.4.3",
-+                "prosemirror-view": "^1.40.1"
-+            },
-             "devDependencies": {
-                 "@tailwindcss/vite": "^4.0.0",
-                 "concurrently": "^9.0.1",
-                 "laravel-vite-plugin": "^1.2.0",
-                 "tailwindcss": "^4.0.0",
-                 "vite": "^6.0.11",
-                 "vite-plugin-image-optimizer": "^2.0.2"
-             }
-         },
-         "node_modules/@ampproject/remapping": {
-             "version": "2.3.0",
-             "resolved": "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.3.0.tgz",
-             "integrity": "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==",
-             "dev": true,
-             "license": "Apache-2.0",
-             "dependencies": {
-                 "@jridgewell/gen-mapping": "^0.3.5",
-                 "@jridgewell/trace-mapping": "^0.3.24"
-             },
-             "engines": {
-                 "node": ">=6.0.0"
-             }
-         },
-         "node_modules/@esbuild/aix-ppc64": {
-             "version": "0.25.8",
-@@ -1694,50 +1704,56 @@
-                 "node": ">=10"
-             },
-             "funding": {
-                 "url": "https://github.com/sponsors/isaacs"
-             }
-         },
-         "node_modules/nanoid": {
-             "version": "3.3.11",
-             "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz",
-             "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==",
-             "dev": true,
-             "funding": [
-                 {
-                     "type": "github",
-                     "url": "https://github.com/sponsors/ai"
-                 }
-             ],
-             "license": "MIT",
-             "bin": {
-                 "nanoid": "bin/nanoid.cjs"
-             },
-             "engines": {
-                 "node": "^10 || ^12 || ^13.7 || ^14 || >=15.0.1"
-             }
-         },
-+        "node_modules/orderedmap": {
-+            "version": "2.1.1",
-+            "resolved": "https://registry.npmjs.org/orderedmap/-/orderedmap-2.1.1.tgz",
-+            "integrity": "sha512-TvAWxi0nDe1j/rtMcWcIj94+Ffe6n7zhow33h40SKxmsmozs6dz/e+EajymfoFcHd7sxNn8yHM8839uixMOV6g==",
-+            "license": "MIT"
-+        },
-         "node_modules/pathe": {
-             "version": "2.0.3",
-             "resolved": "https://registry.npmjs.org/pathe/-/pathe-2.0.3.tgz",
-             "integrity": "sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==",
-             "dev": true,
-             "license": "MIT"
-         },
-         "node_modules/picocolors": {
-             "version": "1.1.1",
-             "resolved": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
-             "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==",
-             "dev": true,
-             "license": "ISC"
-         },
-         "node_modules/picomatch": {
-             "version": "4.0.3",
-             "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
-             "integrity": "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==",
-             "dev": true,
-             "license": "MIT",
-             "engines": {
-                 "node": ">=12"
-             },
-             "funding": {
-                 "url": "https://github.com/sponsors/jonschlinkert"
-@@ -1750,100 +1766,199 @@
-             "dev": true,
-             "funding": [
-                 {
-                     "type": "opencollective",
-                     "url": "https://opencollective.com/postcss/"
-                 },
-                 {
-                     "type": "tidelift",
-                     "url": "https://tidelift.com/funding/github/npm/postcss"
-                 },
-                 {
-                     "type": "github",
-                     "url": "https://github.com/sponsors/ai"
-                 }
-             ],
-             "license": "MIT",
-             "dependencies": {
-                 "nanoid": "^3.3.11",
-                 "picocolors": "^1.1.1",
-                 "source-map-js": "^1.2.1"
-             },
-             "engines": {
-                 "node": "^10 || ^12 || >=14"
-             }
-         },
-+        "node_modules/prosemirror-commands": {
-+            "version": "1.7.1",
-+            "resolved": "https://registry.npmjs.org/prosemirror-commands/-/prosemirror-commands-1.7.1.tgz",
-+            "integrity": "sha512-rT7qZnQtx5c0/y/KlYaGvtG411S97UaL6gdp6RIZ23DLHanMYLyfGBV5DtSnZdthQql7W+lEVbpSfwtO8T+L2w==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.0.0",
-+                "prosemirror-state": "^1.0.0",
-+                "prosemirror-transform": "^1.10.2"
-+            }
-+        },
-+        "node_modules/prosemirror-history": {
-+            "version": "1.4.1",
-+            "resolved": "https://registry.npmjs.org/prosemirror-history/-/prosemirror-history-1.4.1.tgz",
-+            "integrity": "sha512-2JZD8z2JviJrboD9cPuX/Sv/1ChFng+xh2tChQ2X4bB2HeK+rra/bmJ3xGntCcjhOqIzSDG6Id7e8RJ9QPXLEQ==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-state": "^1.2.2",
-+                "prosemirror-transform": "^1.0.0",
-+                "prosemirror-view": "^1.31.0",
-+                "rope-sequence": "^1.3.0"
-+            }
-+        },
-+        "node_modules/prosemirror-keymap": {
-+            "version": "1.2.3",
-+            "resolved": "https://registry.npmjs.org/prosemirror-keymap/-/prosemirror-keymap-1.2.3.tgz",
-+            "integrity": "sha512-4HucRlpiLd1IPQQXNqeo81BGtkY8Ai5smHhKW9jjPKRc2wQIxksg7Hl1tTI2IfT2B/LgX6bfYvXxEpJl7aKYKw==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-state": "^1.0.0",
-+                "w3c-keyname": "^2.2.0"
-+            }
-+        },
-+        "node_modules/prosemirror-model": {
-+            "version": "1.25.2",
-+            "resolved": "https://registry.npmjs.org/prosemirror-model/-/prosemirror-model-1.25.2.tgz",
-+            "integrity": "sha512-BVypCAJ4SL6jOiTsDffP3Wp6wD69lRhI4zg/iT8JXjp3ccZFiq5WyguxvMKmdKFC3prhaig7wSr8dneDToHE1Q==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "orderedmap": "^2.0.0"
-+            }
-+        },
-+        "node_modules/prosemirror-schema-basic": {
-+            "version": "1.2.4",
-+            "resolved": "https://registry.npmjs.org/prosemirror-schema-basic/-/prosemirror-schema-basic-1.2.4.tgz",
-+            "integrity": "sha512-ELxP4TlX3yr2v5rM7Sb70SqStq5NvI15c0j9j/gjsrO5vaw+fnnpovCLEGIcpeGfifkuqJwl4fon6b+KdrODYQ==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.25.0"
-+            }
-+        },
-+        "node_modules/prosemirror-schema-list": {
-+            "version": "1.5.1",
-+            "resolved": "https://registry.npmjs.org/prosemirror-schema-list/-/prosemirror-schema-list-1.5.1.tgz",
-+            "integrity": "sha512-927lFx/uwyQaGwJxLWCZRkjXG0p48KpMj6ueoYiu4JX05GGuGcgzAy62dfiV8eFZftgyBUvLx76RsMe20fJl+Q==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.0.0",
-+                "prosemirror-state": "^1.0.0",
-+                "prosemirror-transform": "^1.7.3"
-+            }
-+        },
-+        "node_modules/prosemirror-state": {
-+            "version": "1.4.3",
-+            "resolved": "https://registry.npmjs.org/prosemirror-state/-/prosemirror-state-1.4.3.tgz",
-+            "integrity": "sha512-goFKORVbvPuAQaXhpbemJFRKJ2aixr+AZMGiquiqKxaucC6hlpHNZHWgz5R7dS4roHiwq9vDctE//CZ++o0W1Q==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.0.0",
-+                "prosemirror-transform": "^1.0.0",
-+                "prosemirror-view": "^1.27.0"
-+            }
-+        },
-+        "node_modules/prosemirror-transform": {
-+            "version": "1.10.4",
-+            "resolved": "https://registry.npmjs.org/prosemirror-transform/-/prosemirror-transform-1.10.4.tgz",
-+            "integrity": "sha512-pwDy22nAnGqNR1feOQKHxoFkkUtepoFAd3r2hbEDsnf4wp57kKA36hXsB3njA9FtONBEwSDnDeCiJe+ItD+ykw==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.21.0"
-+            }
-+        },
-+        "node_modules/prosemirror-view": {
-+            "version": "1.40.1",
-+            "resolved": "https://registry.npmjs.org/prosemirror-view/-/prosemirror-view-1.40.1.tgz",
-+            "integrity": "sha512-pbwUjt3G7TlsQQHDiYSupWBhJswpLVB09xXm1YiJPdkjkh9Pe7Y51XdLh5VWIZmROLY8UpUpG03lkdhm9lzIBA==",
-+            "license": "MIT",
-+            "dependencies": {
-+                "prosemirror-model": "^1.20.0",
-+                "prosemirror-state": "^1.0.0",
-+                "prosemirror-transform": "^1.1.0"
-+            }
-+        },
-         "node_modules/require-directory": {
-             "version": "2.1.1",
-             "resolved": "https://registry.npmjs.org/require-directory/-/require-directory-2.1.1.tgz",
-             "integrity": "sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==",
-             "dev": true,
-             "license": "MIT",
-             "engines": {
-                 "node": ">=0.10.0"
-             }
-         },
-         "node_modules/rollup": {
-             "version": "4.45.1",
-             "resolved": "https://registry.npmjs.org/rollup/-/rollup-4.45.1.tgz",
-             "integrity": "sha512-4iya7Jb76fVpQyLoiVpzUrsjQ12r3dM7fIVz+4NwoYvZOShknRmiv+iu9CClZml5ZLGb0XMcYLutK6w9tgxHDw==",
-             "dev": true,
-             "license": "MIT",
-             "dependencies": {
-                 "@types/estree": "1.0.8"
-             },
-             "bin": {
-                 "rollup": "dist/bin/rollup"
-             },
-             "engines": {
-                 "node": ">=18.0.0",
-                 "npm": ">=8.0.0"
-             },
-             "optionalDependencies": {
-                 "@rollup/rollup-android-arm-eabi": "4.45.1",
-                 "@rollup/rollup-android-arm64": "4.45.1",
-                 "@rollup/rollup-darwin-arm64": "4.45.1",
-                 "@rollup/rollup-darwin-x64": "4.45.1",
-                 "@rollup/rollup-freebsd-arm64": "4.45.1",
-                 "@rollup/rollup-freebsd-x64": "4.45.1",
-                 "@rollup/rollup-linux-arm-gnueabihf": "4.45.1",
-                 "@rollup/rollup-linux-arm-musleabihf": "4.45.1",
-                 "@rollup/rollup-linux-arm64-gnu": "4.45.1",
-                 "@rollup/rollup-linux-arm64-musl": "4.45.1",
-                 "@rollup/rollup-linux-loongarch64-gnu": "4.45.1",
-                 "@rollup/rollup-linux-powerpc64le-gnu": "4.45.1",
-                 "@rollup/rollup-linux-riscv64-gnu": "4.45.1",
-                 "@rollup/rollup-linux-riscv64-musl": "4.45.1",
-                 "@rollup/rollup-linux-s390x-gnu": "4.45.1",
-                 "@rollup/rollup-linux-x64-gnu": "4.45.1",
-                 "@rollup/rollup-linux-x64-musl": "4.45.1",
-                 "@rollup/rollup-win32-arm64-msvc": "4.45.1",
-                 "@rollup/rollup-win32-ia32-msvc": "4.45.1",
-                 "@rollup/rollup-win32-x64-msvc": "4.45.1",
-                 "fsevents": "~2.3.2"
-             }
-         },
-+        "node_modules/rope-sequence": {
-+            "version": "1.3.4",
-+            "resolved": "https://registry.npmjs.org/rope-sequence/-/rope-sequence-1.3.4.tgz",
-+            "integrity": "sha512-UT5EDe2cu2E/6O4igUr5PSFs23nvvukicWHx6GnOPlHAiiYbzNuCRQCuiUdHJQcqKalLKlrYJnjY0ySGsXNQXQ==",
-+            "license": "MIT"
-+        },
-         "node_modules/rxjs": {
-             "version": "7.8.2",
-             "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz",
-             "integrity": "sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==",
-             "dev": true,
-             "license": "Apache-2.0",
-             "dependencies": {
-                 "tslib": "^2.1.0"
-             }
-         },
-         "node_modules/shell-quote": {
-             "version": "1.8.3",
-             "resolved": "https://registry.npmjs.org/shell-quote/-/shell-quote-1.8.3.tgz",
-             "integrity": "sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==",
-             "dev": true,
-             "license": "MIT",
-             "engines": {
-                 "node": ">= 0.4"
-             },
-             "funding": {
-                 "url": "https://github.com/sponsors/ljharb"
-             }
-         },
-         "node_modules/source-map-js": {
-             "version": "1.2.1",
-@@ -2072,50 +2187,56 @@
-             "resolved": "https://registry.npmjs.org/vite-plugin-image-optimizer/-/vite-plugin-image-optimizer-2.0.2.tgz",
-             "integrity": "sha512-BYK27SpSScRIaveJVjbP7EjSrawuCc+ffESGvKVRhByAu6RGvwE3EyGg9ZeqQiLUE8e1hKSCr8v5ZfvQNiqvJQ==",
-             "dev": true,
-             "license": "MIT",
-             "dependencies": {
-                 "ansi-colors": "^4.1.3",
-                 "pathe": "^2.0.3"
-             },
-             "engines": {
-                 "node": ">=18.17.0"
-             },
-             "peerDependencies": {
-                 "sharp": ">=0.34.0",
-                 "svgo": ">=4",
-                 "vite": ">=5"
-             },
-             "peerDependenciesMeta": {
-                 "sharp": {
-                     "optional": true
-                 },
-                 "svgo": {
-                     "optional": true
-                 }
-             }
-         },
-+        "node_modules/w3c-keyname": {
-+            "version": "2.2.8",
-+            "resolved": "https://registry.npmjs.org/w3c-keyname/-/w3c-keyname-2.2.8.tgz",
-+            "integrity": "sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==",
-+            "license": "MIT"
-+        },
-         "node_modules/wrap-ansi": {
-             "version": "7.0.0",
-             "resolved": "https://registry.npmjs.org/wrap-ansi/-/wrap-ansi-7.0.0.tgz",
-             "integrity": "sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==",
-             "dev": true,
-             "license": "MIT",
-             "dependencies": {
-                 "ansi-styles": "^4.0.0",
-                 "string-width": "^4.1.0",
-                 "strip-ansi": "^6.0.0"
-             },
-             "engines": {
-                 "node": ">=10"
-             },
-             "funding": {
-                 "url": "https://github.com/chalk/wrap-ansi?sponsor=1"
-             }
-         },
-         "node_modules/y18n": {
-             "version": "5.0.8",
-             "resolved": "https://registry.npmjs.org/y18n/-/y18n-5.0.8.tgz",
-             "integrity": "sha512-0pfFzegeDWJHJIAmTLRP2DwHjdF5s7jo9tuztdQxAhINCdvS+3nGINqPd00AphqJR/0LhANUS6/+7SCb98YOfA==",
-             "dev": true,
-             "license": "ISC",
-             "engines": {
-diff --git a/package.json b/package.json
-index 415dfd383156d713410744b4e040a9c0428a5b94..0bb73980bf68456ea13d53f1f72435fa97e7d701 100644
---- a/package.json
-+++ b/package.json
-@@ -1,16 +1,26 @@
- {
-     "private": true,
-     "type": "module",
-     "scripts": {
-         "build": "vite build && rm -f public/hot",
-         "dev": "vite"
-     },
-     "devDependencies": {
-         "@tailwindcss/vite": "^4.0.0",
-         "concurrently": "^9.0.1",
-         "laravel-vite-plugin": "^1.2.0",
-         "tailwindcss": "^4.0.0",
-         "vite": "^6.0.11",
-         "vite-plugin-image-optimizer": "^2.0.2"
-+    },
-+    "dependencies": {
-+        "prosemirror-commands": "^1.7.1",
-+        "prosemirror-history": "^1.4.1",
-+        "prosemirror-keymap": "^1.2.3",
-+        "prosemirror-model": "^1.25.2",
-+        "prosemirror-schema-basic": "^1.2.4",
-+        "prosemirror-schema-list": "^1.5.1",
-+        "prosemirror-state": "^1.4.3",
-+        "prosemirror-view": "^1.40.1"
-     }
- }
-diff --git a/resources/js/app.js b/resources/js/app.js
-index 8fe6daf19de394d0aa1995e66d4f0f3f6b0669fd..85a7e666e9d69edc1a7dcc192bdf5f85d517b377 100644
---- a/resources/js/app.js
-+++ b/resources/js/app.js
-@@ -1,40 +1,42 @@
- import * as mobileMenu from './modules/mobile-menu'
- import * as toggle from './modules/toggle'
- import * as amigoLeo from './modules/amigo-leo'
- import * as modal from './modules/modal'
- import * as toast from './modules/toast'
- import * as ajaxPost from './modules/ajax-post.js'
-+import * as richEditor from './modules/rich-text-editor.js'
-
- import.meta.glob([
-     '../img/**',
-     '../fonts/**',
- ])
-
- window.globalModules = {
-     "mobileMenu": mobileMenu,
-     "toggle"    : toggle,
-+    "richEditor": richEditor,
+diff --git a/resources/css/app.css b/resources/css/app.css
+index 4190db44b78a43f25e2e2f88dbdd143d1bf37ab5..32f66c65a780f4bcdd4bc7fd254757f498939ee9 100644
+--- a/resources/css/app.css
++++ b/resources/css/app.css
+@@ -177,25 +177,30 @@ [data-tooltip]::before {
+     --translate-y: calc(-100% - var(--arrow-size));
+     content: attr(data-tooltip);
+     width: max-content;
+     text-align: center;
+     font-size: 0.9rem;
+     font-weight: normal;
+     padding: .1rem .7rem;
+     color: #ece7e7;
+     background: var(--tooltip-color);
+     border-radius: .3rem;
+     border: none;
  }
 
- /*------------------------------------------------
-     Triggers after document load
- -------------------------------------------------*/
- document.addEventListener('DOMContentLoaded', () => {
-     initAllModules()
+ [data-tooltip]::after {
+     --translate-y: calc(-1 * var(--arrow-size) - 1px);
+     content: '';
+     border: var(--arrow-size) solid transparent;
+     border-top-color: var(--tooltip-color);
+     transform-origin: top center;
+ }
 
-     if (document.keyboardShortcutEventAdded !== true) {
-         let ignoreKeys = ['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft', 'Alt', 'Shift', 'Meta']
-         document.addEventListener('keydown', (event) => {
-             if (ignoreKeys.indexOf(event.key) <= -1 && event.ctrlKey && event.key === 'b') {
-                 // some action / click / etc
-             }
-
-             if (ignoreKeys.indexOf(event.key) <= -1 && event.key === 'Escape') {
-                 // some action / click / etc
-                 // Example: Modal.close('main-modal')
-             }
-         }, {once: false})
-         document.keyboardShortcutEventAdded = true
-     }
- })
-
- /*------------------------------------------------
-diff --git a/resources/js/modules/rich-text-editor.js b/resources/js/modules/rich-text-editor.js
-new file mode 100644
-index 0000000000000000000000000000000000000000..205d6b6bc6e8fb81adebdd443dbac9b945d27f57
---- /dev/null
-+++ b/resources/js/modules/rich-text-editor.js
-@@ -0,0 +1,170 @@
-+import {EditorState} from 'prosemirror-state'
-+import {EditorView} from 'prosemirror-view'
-+import {Schema, DOMParser as ProseParser, DOMSerializer} from 'prosemirror-model'
-+import {schema as basicSchema} from 'prosemirror-schema-basic'
-+import {addListNodes, wrapInList} from 'prosemirror-schema-list'
-+import {history, undo, redo} from 'prosemirror-history'
-+import {keymap} from 'prosemirror-keymap'
-+import {baseKeymap, toggleMark, setBlockType, wrapIn} from 'prosemirror-commands'
+ [data-tooltip]:hover::before,
+ [data-tooltip]:hover::after{
+     --scale: 1;
+ }
 +
-+const underline = {
-+    parseDOM: [{tag: 'u'}, {style: 'text-decoration=underline'}],
-+    toDOM() { return ['u', 0] }
-+}
-+
-+const strike = {
-+    parseDOM: [{tag: 's'}, {tag: 'del'}, {style: 'text-decoration=line-through'}],
-+    toDOM() { return ['s', 0] }
-+}
-+
-+export function init() {
-+    document.querySelectorAll('[data-rich-text-editor]').forEach(container => {
-+        if (container.editor) return
-+        const targetId = container.id
-+        const hidden = document.querySelector(`[data-editor-target="${targetId}"]`)
-+        const value = hidden ? hidden.value : ''
-+
-+        const nodes = addListNodes(basicSchema.spec.nodes, 'paragraph block*', 'block')
-+            .update('paragraph', {
-+                content: 'inline*',
-+                group: 'block',
-+                attrs: {align: {default: 'left'}},
-+                parseDOM: [{tag: 'p', getAttrs: dom => ({align: dom.style.textAlign || 'left'})}],
-+                toDOM(node) { return ['p', {style: `text-align:${node.attrs.align}`}, 0] }
-+            })
-+            .update('heading', {
-+                content: 'inline*',
-+                group: 'block',
-+                defining: true,
-+                attrs: {level: {default: 1}, align: {default: 'left'}},
-+                parseDOM: [
-+                    {tag: 'h1', getAttrs: dom => ({level:1, align: dom.style.textAlign || 'left'})},
-+                    {tag: 'h2', getAttrs: dom => ({level:2, align: dom.style.textAlign || 'left'})},
-+                    {tag: 'h3', getAttrs: dom => ({level:3, align: dom.style.textAlign || 'left'})},
-+                    {tag: 'h4', getAttrs: dom => ({level:4, align: dom.style.textAlign || 'left'})},
-+                    {tag: 'h5', getAttrs: dom => ({level:5, align: dom.style.textAlign || 'left'})},
-+                    {tag: 'h6', getAttrs: dom => ({level:6, align: dom.style.textAlign || 'left'})},
-+                ],
-+                toDOM(node) { return ['h'+node.attrs.level, {style: `text-align:${node.attrs.align}`}, 0] }
-+            })
-+
-+        const marks = basicSchema.spec.marks
-+            .addBefore('link', 'underline', underline)
-+            .addToEnd('strike', strike)
-+
-+        const schema = new Schema({nodes, marks})
-+
-+        const parser = new DOMParser()
-+        const content = parser.parseFromString(value || '<p></p>', 'text/html')
-+        const state = EditorState.create({
-+            doc: ProseParser.fromSchema(schema).parse(content.body),
-+            plugins: [
-+                history(),
-+                keymap(baseKeymap)
-+            ]
-+        })
-+
-+        const view = new EditorView(container.querySelector('.editor'), {
-+            state,
-+            dispatchTransaction(tr){
-+                const newState = view.state.apply(tr)
-+                view.updateState(newState)
-+                if(hidden){
-+                    hidden.value = getHTML(view.state.doc, schema)
-+                }
-+            }
-+        })
-+
-+        setupToolbar(container, schema, view)
-+        container.editor = view
-+    })
-+}
-+
-+function setupToolbar(container, schema, view){
-+    container.querySelectorAll('[data-command]').forEach(btn => {
-+        const cmd = btn.getAttribute('data-command')
-+        if(cmd === 'heading'){
-+            btn.addEventListener('change', e => {
-+                const level = Number(e.target.value)
-+                if(level === 0){
-+                    setBlockType(schema.nodes.paragraph)(view.state, view.dispatch)
-+                }else{
-+                    setBlockType(schema.nodes.heading, {level})(view.state, view.dispatch)
-+                }
-+                view.focus()
-+            })
-+        } else if(cmd === 'bullet'){
-+            btn.addEventListener('click', () => {
-+                wrapInList(schema.nodes.bullet_list)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'ordered'){
-+            btn.addEventListener('click', () => {
-+                wrapInList(schema.nodes.ordered_list)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'blockquote'){
-+            btn.addEventListener('click', () => {
-+                wrapIn(schema.nodes.blockquote)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'code'){
-+            btn.addEventListener('click', () => {
-+                setBlockType(schema.nodes.code_block)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'bold'){
-+            btn.addEventListener('click', () => {
-+                toggleMark(schema.marks.strong)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'italic'){
-+            btn.addEventListener('click', () => {
-+                toggleMark(schema.marks.em)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'strike'){
-+            btn.addEventListener('click', () => {
-+                toggleMark(schema.marks.strike)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'underline'){
-+            btn.addEventListener('click', () => {
-+                toggleMark(schema.marks.underline)(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'link'){
-+            btn.addEventListener('click', () => {
-+                const url = prompt('URL')
-+                if(url){
-+                    toggleMark(schema.marks.link, {href: url})(view.state, view.dispatch)
-+                    view.focus()
-+                }
-+            })
-+        } else if(cmd === 'align-left' || cmd === 'align-center' || cmd === 'align-right'){
-+            btn.addEventListener('click', () => {
-+                const align = cmd.split('-')[1]
-+                setBlockType(getCurrentBlockType(view, schema), {align})(view.state, view.dispatch)
-+                view.focus()
-+            })
-+        } else if(cmd === 'undo'){
-+            btn.addEventListener('click', () => { undo(view.state, view.dispatch); view.focus() })
-+        } else if(cmd === 'redo'){
-+            btn.addEventListener('click', () => { redo(view.state, view.dispatch); view.focus() })
-+        }
-+    })
-+}
-+
-+function getCurrentBlockType(view, schema){
-+    const {$from} = view.state.selection
-+    if($from.parent.type === schema.nodes.heading) return schema.nodes.heading
-+    if($from.parent.type === schema.nodes.code_block) return schema.nodes.code_block
-+    if($from.parent.type === schema.nodes.blockquote) return schema.nodes.blockquote
-+    return schema.nodes.paragraph
-+}
-+
-+function getHTML(doc, schema){
-+    const div = document.createElement('div')
-+    div.appendChild(DOMSerializer.fromSchema(schema).serializeFragment(doc.content))
-+    return div.innerHTML
++/* Style for rich text editor toolbar */
++[data-rich-text-editor] .toolbar .toolbar-item {
++    @apply rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
 +}
 diff --git a/resources/views/components/forms/rich-text-editor.blade.php b/resources/views/components/forms/rich-text-editor.blade.php
-new file mode 100644
-index 0000000000000000000000000000000000000000..dfc0cdb16352f55ca10759b3dbec7a2e01152eaa
---- /dev/null
+index dfc0cdb16352f55ca10759b3dbec7a2e01152eaa..50256fa2064c2ea04bba3af9886edfafd7fa588d 100644
+--- a/resources/views/components/forms/rich-text-editor.blade.php
 +++ b/resources/views/components/forms/rich-text-editor.blade.php
-@@ -0,0 +1,31 @@
-+@props(['name', 'id' => null, 'value' => ''])
-+@php use Illuminate\Support\Str; @endphp
-+@php
-+    $id = $id ?? Str::uuid()->toString();
-+@endphp
-+<div id="{{ $id }}" data-rich-text-editor class="bg-white p-2 border border-gray-300 rounded-md">
-+    <div class="toolbar flex flex-wrap gap-1 mb-2">
-+        <select data-command="heading" class="border rounded p-1 text-sm">
-+            <option value="0">Parágrafo</option>
-+            <option value="1">H1</option>
-+            <option value="2">H2</option>
-+            <option value="3">H3</option>
-+        </select>
-+        <button type="button" data-command="bold" class="px-1 font-bold">B</button>
-+        <button type="button" data-command="italic" class="px-1 italic">I</button>
-+        <button type="button" data-command="strike" class="px-1 line-through">S</button>
-+        <button type="button" data-command="underline" class="px-1 underline">U</button>
-+        <button type="button" data-command="bullet" class="px-1">•</button>
-+        <button type="button" data-command="ordered" class="px-1">1.</button>
-+        <button type="button" data-command="blockquote" class="px-1">"</button>
-+        <button type="button" data-command="code" class="px-1">{ }</button>
-+        <button type="button" data-command="link" class="px-1">🔗</button>
-+        <button type="button" data-command="align-left" class="px-1">⬅</button>
-+        <button type="button" data-command="align-center" class="px-1">↔</button>
-+        <button type="button" data-command="align-right" class="px-1">➡</button>
-+        <button type="button" data-command="undo" class="px-1">↶</button>
-+        <button type="button" data-command="redo" class="px-1">↷</button>
-+    </div>
-+    <div class="editor min-h-[100px] outline-none"></div>
-+</div>
-+<input type="hidden" name="{{ $name }}" value="{{ $value }}" data-editor-target="{{ $id }}">
+@@ -1,31 +1,31 @@
+ @props(['name', 'id' => null, 'value' => ''])
+ @php use Illuminate\Support\Str; @endphp
+ @php
+     $id = $id ?? Str::uuid()->toString();
+ @endphp
+ <div id="{{ $id }}" data-rich-text-editor class="bg-white p-2 border border-gray-300 rounded-md">
+-    <div class="toolbar flex flex-wrap gap-1 mb-2">
+-        <select data-command="heading" class="border rounded p-1 text-sm">
++    <div class="toolbar flex flex-wrap gap-1 mb-2 text-gray-600">
++        <select data-command="heading" class="toolbar-item text-sm">
+             <option value="0">Parágrafo</option>
+             <option value="1">H1</option>
+             <option value="2">H2</option>
+             <option value="3">H3</option>
+         </select>
+-        <button type="button" data-command="bold" class="px-1 font-bold">B</button>
+-        <button type="button" data-command="italic" class="px-1 italic">I</button>
+-        <button type="button" data-command="strike" class="px-1 line-through">S</button>
+-        <button type="button" data-command="underline" class="px-1 underline">U</button>
+-        <button type="button" data-command="bullet" class="px-1">•</button>
+-        <button type="button" data-command="ordered" class="px-1">1.</button>
+-        <button type="button" data-command="blockquote" class="px-1">"</button>
+-        <button type="button" data-command="code" class="px-1">{ }</button>
+-        <button type="button" data-command="link" class="px-1">🔗</button>
+-        <button type="button" data-command="align-left" class="px-1">⬅</button>
+-        <button type="button" data-command="align-center" class="px-1">↔</button>
+-        <button type="button" data-command="align-right" class="px-1">➡</button>
+-        <button type="button" data-command="undo" class="px-1">↶</button>
+-        <button type="button" data-command="redo" class="px-1">↷</button>
++        <button type="button" data-command="bold" class="toolbar-item font-bold">B</button>
++        <button type="button" data-command="italic" class="toolbar-item italic">I</button>
++        <button type="button" data-command="strike" class="toolbar-item line-through">S</button>
++        <button type="button" data-command="underline" class="toolbar-item underline">U</button>
++        <button type="button" data-command="bullet" class="toolbar-item">•</button>
++        <button type="button" data-command="ordered" class="toolbar-item">1.</button>
++        <button type="button" data-command="blockquote" class="toolbar-item">"</button>
++        <button type="button" data-command="code" class="toolbar-item">{ }</button>
++        <button type="button" data-command="link" class="toolbar-item">🔗</button>
++        <button type="button" data-command="align-left" class="toolbar-item">⬅</button>
++        <button type="button" data-command="align-center" class="toolbar-item">↔</button>
++        <button type="button" data-command="align-right" class="toolbar-item">➡</button>
++        <button type="button" data-command="undo" class="toolbar-item">↶</button>
++        <button type="button" data-command="redo" class="toolbar-item">↷</button>
+     </div>
+     <div class="editor min-h-[100px] outline-none"></div>
+ </div>
+ <input type="hidden" name="{{ $name }}" value="{{ $value }}" data-editor-target="{{ $id }}">
 
 EOF
 )
