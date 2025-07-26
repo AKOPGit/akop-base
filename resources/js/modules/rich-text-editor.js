@@ -6,6 +6,7 @@ import {addListNodes, wrapInList} from 'prosemirror-schema-list'
 import {history, undo, redo} from 'prosemirror-history'
 import {keymap} from 'prosemirror-keymap'
 import {baseKeymap, toggleMark, setBlockType, wrapIn} from 'prosemirror-commands'
+import {inputRules, textblockTypeInputRule} from 'prosemirror-inputrules'
 
 const underline = {
     parseDOM: [{tag: 'u'}, {style: 'text-decoration=underline'}],
@@ -60,6 +61,7 @@ export function init() {
             doc: ProseParser.fromSchema(schema).parse(content.body),
             plugins: [
                 history(),
+                inputRules({rules: buildInputRules(schema)}),
                 keymap(baseKeymap)
             ]
         })
@@ -167,4 +169,12 @@ function getHTML(doc, schema){
     const div = document.createElement('div')
     div.appendChild(DOMSerializer.fromSchema(schema).serializeFragment(doc.content))
     return div.innerHTML
+}
+
+function buildInputRules(schema){
+    const rules = []
+    if(schema.nodes.heading){
+        rules.push(textblockTypeInputRule(/^(#{1,6})\s$/, schema.nodes.heading, match => ({level: match[1].length})) )
+    }
+    return rules
 }

@@ -199,3 +199,14 @@ dialog::backdrop {
 [data-tooltip]:hover::after{
     --scale: 1;
 }
+
+/* Style for rich text editor toolbar */
+[data-rich-text-editor] .toolbar .toolbar-item {
+    @apply rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
+}
+
+/* Remove focus outline from editor */
+[data-rich-text-editor] .editor .ProseMirror:focus,
+[data-rich-text-editor] .editor .ProseMirror-focused {
+    @apply outline-none;
+}
