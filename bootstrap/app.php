@@ -1,11 +1,11 @@
 <?php
 
+use App\Exceptions\Auth\LoginException;
+use App\Exceptions\Auth\RegistrationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use App\Exceptions\Auth\LoginException;
-use App\Exceptions\Auth\RegistrationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

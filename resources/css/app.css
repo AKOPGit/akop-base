@@ -2,6 +2,7 @@
 @import './components/checkboxes.css';
 @import './components/radios.css';
 @import './components/scrollbar.css';
+@import './components/rich-text-editor.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -198,55 +199,5 @@ dialog::backdrop {
 [data-tooltip]:hover::before,
 [data-tooltip]:hover::after{
     --scale: 1;
-}
-
-/* Style for rich text editor toolbar */
-[data-rich-text-editor] .toolbar .toolbar-item {
-    @apply p-1.5 text-base text-gray-600 border-1 border-transparent hover:border-gray-200 hover:border-1 hover:bg-gray-100 active:bg-gray-200 focus:outline-none;
-}
-[data-rich-text-editor] .toolbar .toolbar-item.active {
-    @apply bg-gray-200 border-gray-200;
-}
-
-/* Remove focus outline from editor */
-[data-rich-text-editor] .editor .ProseMirror:focus,
-[data-rich-text-editor] .editor .ProseMirror-focused {
-    @apply outline-none;
-}
-
-/* Rich text editor styles for .editor */
-[data-rich-text-editor] .editor p {
-    @apply text-gray-700
-}
-[data-rich-text-editor] .editor h1 {
-    @apply text-3xl font-bold mt-6 mb-2 text-gray-800;
-}
-
-[data-rich-text-editor] .editor h2 {
-    @apply text-2xl font-semibold mt-4 mb-2 text-gray-700;
-}
-
-[data-rich-text-editor] .editor h3 {
-    @apply text-xl font-semibold mt-4 mb-2 text-gray-700;
-}
-
-[data-rich-text-editor] .editor ul {
-    @apply list-disc ml-5 mb-4;
-}
-
-[data-rich-text-editor] .editor ol {
-    @apply list-decimal ml-5 mb-4;
-}
-
-[data-rich-text-editor] .editor a {
-    @apply text-blue-600 underline hover:text-blue-800;
-}
-
-[data-rich-text-editor] .editor blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4;
-}
-
-[data-rich-text-editor] .editor pre {
-    @apply bg-gray-100 text-sm font-mono p-4 rounded overflow-x-auto my-4;
 }
 

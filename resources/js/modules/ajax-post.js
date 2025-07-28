@@ -1,6 +1,5 @@
 import * as ajaxModule from './ajax'
 import {updateSlots} from './ajax-slot'
-import {closeAllSidePanels, openSidePanel} from './side-panel'
 
 document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', function (e) {
@@ -102,18 +101,8 @@ async function handleAjaxResponse(response, button) {
         }
     }
 
-
-    // Handle side panel and modal behaviors based on server response
-    if (data.closeSidePanel === 1) {
-        closeAllSidePanels()
-    }
-
     if (data.redirect) {
         window.location.replace(data.redirect)
-    }
-
-    if (data.openSidePanel) {
-        openSidePanel(data.openSidePanel)
     }
 
     if (data.modalIdToClose) {
