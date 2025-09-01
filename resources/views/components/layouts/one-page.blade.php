@@ -78,7 +78,7 @@
 
         <main class="flex-grow">
             <!-- Hero -->
-            <section class="relative py-20 bg-gray-50 dark:bg-gray-800 z-0">
+            <section class="relative py-20 bg-gray-50 dark:bg-gray-800 -z-10">
                 <div class="container mx-auto px-4 text-center">
                     <h1 class="text-4xl font-extrabold mb-4">Bem-vindo ao nosso site</h1>
                     <p class="max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">Uma pagina simples inspirada
